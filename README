@@ -16,18 +16,16 @@ This layer depends on:
   layers: meta
   branch: master
 
-  URI: git://git.yoctoproject.org/xxxx
-  layers: xxxx
+  URI: git://git.yoctoproject.org/meta-mono
   branch: master
 
 
 Patches
 =======
 
-Please submit any patches against the aspnet layer to the
-xxxx mailing list (xxxx@zzzz.org) and cc: the maintainer:
+You are encouraged to fork this repository and share your patches.
 
-Maintainer: XXX YYYYYY <xxx.yyyyyy@zzzzz.com>
+Maintainer: Kai Ruhnau <kai.ruhnau@target-sg.com>
 
 
 Table of Contents
@@ -39,8 +37,6 @@ Table of Contents
 
 I. Adding the aspnet layer to your build
 =================================================
-
---- replace with specific instructions for the aspnet layer ---
 
 In order to use this layer, you need to make the build system aware of
 it.
@@ -54,6 +50,7 @@ other layers needed. e.g.:
     /path/to/yocto/meta \
     /path/to/yocto/meta-yocto \
     /path/to/yocto/meta-yocto-bsp \
+    /path/to/yocto/meta-mono \
     /path/to/yocto/meta-aspnet \
     "
 
@@ -61,4 +58,4 @@ other layers needed. e.g.:
 II. Misc
 ========
 
---- replace with specific information about the aspnet layer ---
+hmm…
