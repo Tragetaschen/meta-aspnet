@@ -1,5 +1,5 @@
-SRC_URI = "http://www.myget.org/F/aspnetvnext/api/v2/package/KRE-mono45-x86/${PV};downloadfilename=KRE-mono45-x86.${PV}.zip;name=kre;subdir=${PN}-${PV} \
-           https://raw.githubusercontent.com/aspnet/KRuntime/dev/LICENSE.txt;name=license;downloadfilename=KRE-license"
+SRC_URI="http://www.myget.org/F/aspnetvnext/api/v2/package/KRE-mono45-x86/${PV};downloadfilename=KRE-mono45-x86.${PV}.zip;name=kre;subdir=${PN}-${PV} \
+         https://raw.githubusercontent.com/aspnet/KRuntime/dev/LICENSE.txt;name=license;downloadfilename=KRE-license"
 LICENSE="Apache-2.0"			
 LIC_FILES_CHKSUM="file://${WORKDIR}/KRE-license;md5=18d62531c894e91f9f01b5146b73468d"
 
