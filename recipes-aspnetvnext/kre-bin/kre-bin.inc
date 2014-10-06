@@ -2,7 +2,7 @@ SRC_URI="${SERVER_URI}/package/KRE-mono45-x86/${PV};downloadfilename=KRE-mono45-
          https://raw.githubusercontent.com/aspnet/KRuntime/dev/LICENSE.txt;name=license;downloadfilename=KRE-license"
 LICENSE="Apache-2.0"			
 LIC_FILES_CHKSUM="file://${WORKDIR}/KRE-license;md5=18d62531c894e91f9f01b5146b73468d"
-RDEPENDS_${PN}+="mono (=git)"
+RDEPENDS_${PN}+="mono (=3.8.0)"
 BBCLASSEXTEND=+"native"
 
 SRC_URI[license.md5sum] = "18d62531c894e91f9f01b5146b73468d"
