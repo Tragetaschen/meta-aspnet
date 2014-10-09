@@ -1,5 +1,6 @@
 DEPENDS=+"mono-native"
 LICENSE="CLOSED"
+BBCLASSEXTEND=+"native"
 
 FILES_${PN} += " ${datadir}/.mono"
 
