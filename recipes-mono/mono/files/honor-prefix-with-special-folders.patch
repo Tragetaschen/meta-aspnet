@@ -1,0 +1,39 @@
+--- a/mcs/class/corlib/System/Environment.cs
++++ b/mcs/class/corlib/System/Environment.cs
+@@ -548,6 +548,18 @@ namespace System {
+ 			return Path.Combine (home_dir, fallback);
+ 		}
+ 
++		static string prefix;
++		private static string Prefix {
++			get {
++				if (prefix == null) {
++					prefix = internalGetEnvironmentVariable("PSEUDO_PREFIX");
++					if (prefix == null)
++						prefix = "/usr";
++				}
++				return prefix;
++			}
++		}
++
+ 
+ 		// the security runtime (and maybe other parts of corlib) needs the
+ 		// information to initialize themselves before permissions can be checked
+@@ -634,7 +646,7 @@ namespace System {
+ #endif
+ #if NET_4_0
+ 			case SpecialFolder.CommonTemplates:
+-				return "/usr/share/templates";
++				return Path.Combine(Prefix, "share/templates");
+ 			case SpecialFolder.Fonts:
+ 				if (Platform == PlatformID.MacOSX)
+ 					return Path.Combine (home, "Library", "Fonts");
+@@ -702,7 +714,7 @@ namespace System {
+ 				return String.Empty;
+ 			// This is where data common to all users goes
+ 			case SpecialFolder.CommonApplicationData:
+-				return "/usr/share";
++				return Path.Combine(Prefix, "share");
+ 			default:
+ 				throw new ArgumentException ("Invalid SpecialFolder");
+                         }
