@@ -4,8 +4,10 @@ RDEPENDS_${PN}+="mono (=3.10.0)"
 BBCLASSEXTEND=+"native"
 DEPENDS_${PN}+="mono (=3.10.0) vnext-certs-native"
 
+inherit KRuntime-environment
+
 do_compile() {
-    XDG_DATA_HOME=${DL_DIR}/.cachedir KRE_USER_HOME=${DL_DIR}/.kre USERPROFILE=${DL_DIR} sh build.sh
+    sh build.sh
 }
 
 do_install() {
