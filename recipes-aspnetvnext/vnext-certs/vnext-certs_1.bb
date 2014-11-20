@@ -6,7 +6,7 @@ FILES_${PN} += " ${datadir}/.mono"
 
 inherit KRuntime-environment
 
-do_fetch() {
+do_compile() {
 	export PSEUDO_PREFIX=${S}/usr
 	yes yes | certmgr -ssl -m https://go.microsoft.com
 	yes yes | certmgr -ssl -m https://nugetgallery.blob.core.windows.net
