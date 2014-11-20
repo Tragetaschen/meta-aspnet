@@ -1,4 +1,5 @@
-DEPENDS="mono-native vnext-certs-native"
+DEPENDS=+" mono-native vnext-certs-native KRuntime-native"
+RDEPENDS_${PN}+="KRuntime"
 
 BUILD="${WORKDIR}/build"
 FILES_${PN} += "/opt/${PN}"

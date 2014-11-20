@@ -1,4 +1,4 @@
-DEPENDS=+"mono-native"
+DEPENDS=+" mono-native"
 LICENSE="CLOSED"
 BBCLASSEXTEND=+"native"
 
