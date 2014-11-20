@@ -1,4 +1,4 @@
-SRC_URI="git://github.com/Tragetaschen/KRuntime.git;branch=linux-vanilla-build"
+SRC_URI="git://github.com/aspnet/KRuntime.git;branch=dev"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/git"
 
