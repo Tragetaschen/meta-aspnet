@@ -4,4 +4,4 @@ LIC_FILES_CHKSUM="file://../../LICENSE.txt;md5=18d62531c894e91f9f01b5146b73468d"
 
 S="${WORKDIR}/KRuntime-${PV}/samples/HelloWorld"
 
-inherit aspnetvnext
+inherit aspnet5
