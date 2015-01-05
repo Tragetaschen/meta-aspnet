@@ -14,12 +14,19 @@ do_install() {
     OUT=artifacts/build/KRE-Mono/bin
 
     install -d ${D}${bindir}
-    for i in k klr kpm; do
-        target=${D}${bindir}/${i}
-        # Update the scripts to look in libdir
-        sed -e "2,9d" -e "10iDIR=${libdir}/${PN}" ${S}/${OUT}/${i} > ${target}
-        chmod 0755 ${target}
-    done
+    echo "#!/bin/bash
+exec ${bindir}/klr ${libdir}/${PN}/Microsoft.Framework.ApplicationHost.dll \"\$@\"
+" > ${D}${bindir}/k
+    echo "#!/bin/bash
+exec ${bindir}/klr ${libdir}/${PN}/lib/Microsoft.Framework.PackageManager/Microsoft.Framework.PackageManager.dll \"\$@\"
+" > ${D}${bindir}/kpm
+    echo "#!/bin/bash
+exec ${bindir}/mono \$MONO_OPTIONS ${libdir}/${PN}/klr.mono.managed.dll \"\$@\"
+" > ${D}${bindir}/klr
+
+    chmod 0755 ${D}${bindir}/k
+    chmod 0755 ${D}${bindir}/kpm
+    chmod 0755 ${D}${bindir}/klr
 
     install -d ${D}${libdir}/${PN}/lib
     for i in ${S}/${OUT}/*.dll; do
