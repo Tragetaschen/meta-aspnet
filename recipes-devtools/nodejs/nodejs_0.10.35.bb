@@ -33,6 +33,8 @@ do_compile () {
 
 do_install () {
     oe_runmake install DESTDIR=${D}
+
+    npm config set cache "${DL_DIR}/.npm" --global
 }
 
 RDEPENDS_${PN} = "curl python-shell python-datetime python-subprocess python-crypt python-textutils python-netclient "
