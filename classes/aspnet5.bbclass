@@ -8,7 +8,7 @@ inherit KRuntime-environment
 
 do_compile () {
     kpm restore
-    kpm pack --no-source -o ${BUILD}
+    kpm pack --no-source --quiet -o ${BUILD}
 }
 
 do_install () {
