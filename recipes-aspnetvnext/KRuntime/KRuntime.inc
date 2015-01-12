@@ -5,6 +5,7 @@ BBCLASSEXTEND=+"native"
 DEPENDS=+" mono-native vnext-certs-native"
 
 inherit KRuntime-environment
+export KRE_USER_HOME = "${DL_DIR}/.kre"
 
 do_compile() {
     sh build.sh
