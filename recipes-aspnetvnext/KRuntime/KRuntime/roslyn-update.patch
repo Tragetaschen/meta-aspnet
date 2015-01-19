@@ -1,0 +1,44 @@
+commit fbf7882baca25293616e950aa7350d850edad4bb
+Author: Pranav K <prkrishn@hotmail.com>
+Date:   Sun Dec 21 23:27:35 2014 -0800
+
+    Reacting to Rolsyn changes
+
+commit ad6076051b491beff33d6ac5896349b4bd250600
+Author: Troy Dai <troy.dai@outlook.com>
+Date:   Tue Jan 6 09:32:06 2015 -0800
+
+    Fix build break
+
+diff --git a/src/Microsoft.Framework.Runtime.Roslyn/AssemblyNeutral/TypeCompilationContext.cs b/src/Microsoft.Framework.Runtime.Roslyn/AssemblyNeutral/TypeCompilationContext.cs
+index f8f2bca..f52e1e0 100644
+--- a/src/Microsoft.Framework.Runtime.Roslyn/AssemblyNeutral/TypeCompilationContext.cs
++++ b/src/Microsoft.Framework.Runtime.Roslyn/AssemblyNeutral/TypeCompilationContext.cs
+@@ -255,12 +255,12 @@ private IEnumerable<SyntaxNode> GetNodesToRemove(SyntaxNode root, SyntaxNode tar
+                         continue;
+                     }
+ 
+-                    if (remove.CSharpKind() == SyntaxKind.UsingDirective)
++                    if (remove.IsKind(SyntaxKind.UsingDirective))
+                     {
+                         continue;
+                     }
+ 
+-                    if (parent.CSharpKind() == SyntaxKind.NamespaceDeclaration && (
++                    if (parent.IsKind(SyntaxKind.NamespaceDeclaration) && (
+                         (parent as NamespaceDeclarationSyntax).Name == remove))
+                     {
+                         continue;
+diff --git a/src/Microsoft.Framework.Runtime.Roslyn/RoslynCompiler.cs b/src/Microsoft.Framework.Runtime.Roslyn/RoslynCompiler.cs
+index b8aa863..e3cf4db 100644
+--- a/src/Microsoft.Framework.Runtime.Roslyn/RoslynCompiler.cs
++++ b/src/Microsoft.Framework.Runtime.Roslyn/RoslynCompiler.cs
+@@ -94,7 +94,7 @@ public class RoslynCompiler
+             }
+ 
+             var parseOptions = new CSharpParseOptions(languageVersion: compilationSettings.LanguageVersion,
+-                                                      preprocessorSymbols: compilationSettings.Defines.AsImmutable());
++                                                      preprocessorSymbols: compilationSettings.Defines);
+ 
+             IList<SyntaxTree> trees = GetSyntaxTrees(
+                 project,
