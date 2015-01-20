@@ -34,11 +34,12 @@ do_compile () {
 do_install () {
     oe_runmake install DESTDIR=${D}
 
-    npm config set cache "${DL_DIR}/.npm" --global
+    install -d ${D}${prefix}/etc
+    echo "cache = ${DL_DIR}/.npm" > ${D}${prefix}/etc/npmrc
 }
 
 RDEPENDS_${PN} = "curl python-shell python-datetime python-subprocess python-crypt python-textutils python-netclient "
 RDEPENDS_${PN}_class-native = ""
 
-FILES_${PN} += "${libdir}/node/wafadmin ${libdir}/node_modules ${libdir}/dtrace ${libdir}/*"
+FILES_${PN} += "${libdir}/node/wafadmin ${libdir}/node_modules ${libdir}/dtrace ${libdir}/* ${prefix}/etc"
 BBCLASSEXTEND = "native"
