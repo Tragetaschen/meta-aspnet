@@ -1,0 +1,338 @@
+From 0e534d4ae860a3f2d398fc3e49d83455ef9d1df9 Mon Sep 17 00:00:00 2001
+From: Kai Ruhnau <kai.ruhnau@target-sg.com>
+Date: Tue, 27 Jan 2015 09:30:33 +0100
+Subject: [PATCH] Populate the RequestingAssembly property of ResolveEventArgs
+
+---
+ mcs/class/corlib/System/AppDomain.cs |  4 +--
+ mono/metadata/appdomain.c            | 26 ++++++++------------
+ mono/metadata/assembly.c             | 47 ++++++++++++++++++++++--------------
+ mono/metadata/domain-internals.h     |  5 +++-
+ mono/tests/Makefile.am               |  1 +
+ mono/tests/assemblyresolve_event4.cs | 34 ++++++++++++++++++++++++++
+ 6 files changed, 80 insertions(+), 37 deletions(-)
+ create mode 100644 mono/tests/assemblyresolve_event4.cs
+
+diff --git a/mcs/class/corlib/System/AppDomain.cs b/mcs/class/corlib/System/AppDomain.cs
+index 5e0fbf7..f008555 100644
+--- a/mcs/class/corlib/System/AppDomain.cs
++++ b/mcs/class/corlib/System/AppDomain.cs
+@@ -1195,7 +1195,7 @@ namespace System {
+ 			AssemblyLoad (this, new AssemblyLoadEventArgs (assembly));
+ 		}
+ 
+-		private Assembly DoAssemblyResolve (string name, bool refonly)
++		private Assembly DoAssemblyResolve (string name, Assembly requestingAssembly, bool refonly)
+ 		{
+ 			ResolveEventHandler del;
+ #if !NET_2_1
+@@ -1234,7 +1234,11 @@ namespace System {
+ 
+ 				foreach (Delegate eh in invocation_list) {
+ 					ResolveEventHandler handler = (ResolveEventHandler) eh;
++#if NET_4_0
++					Assembly assembly = handler (this, new ResolveEventArgs (name, requestingAssembly));
++#else
+					Assembly assembly = handler (this, new ResolveEventArgs (name));
++#endif
+ 					if (assembly != null)
+ 						return assembly;
+ 				}
+diff --git a/mono/metadata/appdomain.c b/mono/metadata/appdomain.c
+index aa8fe26..c1c316b 100644
+--- a/mono/metadata/appdomain.c
++++ b/mono/metadata/appdomain.c
+@@ -106,10 +106,6 @@ static MonoAssembly *
+ mono_domain_assembly_search (MonoAssemblyName *aname,
+ 							 gpointer user_data);
+ 
+-static MonoAssembly *
+-mono_domain_assembly_postload_search (MonoAssemblyName *aname,
+-									  gpointer user_data);
+-
+ static void
+ mono_domain_fire_assembly_load (MonoAssembly *assembly, gpointer user_data);
+ 
+@@ -234,8 +230,6 @@ mono_runtime_init (MonoDomain *domain, MonoThreadStartCB start_cb,
+ 	mono_install_assembly_refonly_preload_hook (mono_domain_assembly_preload, GUINT_TO_POINTER (TRUE));
+ 	mono_install_assembly_search_hook (mono_domain_assembly_search, GUINT_TO_POINTER (FALSE));
+ 	mono_install_assembly_refonly_search_hook (mono_domain_assembly_search, GUINT_TO_POINTER (TRUE));
+-	mono_install_assembly_postload_search_hook (mono_domain_assembly_postload_search, GUINT_TO_POINTER (FALSE));
+-	mono_install_assembly_postload_refonly_search_hook (mono_domain_assembly_postload_search, GUINT_TO_POINTER (TRUE));
+ 	mono_install_assembly_load_hook (mono_domain_fire_assembly_load, NULL);
+ 	mono_install_lookup_dynamic_token (mono_reflection_lookup_dynamic_token);
+ 
+@@ -913,12 +907,12 @@ ves_icall_System_AppDomain_GetAssemblies (MonoAppDomain *ad, MonoBoolean refonly
+ }
+ 
+ MonoReflectionAssembly *
+-mono_try_assembly_resolve (MonoDomain *domain, MonoString *fname, gboolean refonly)
++mono_try_assembly_resolve (MonoDomain *domain, MonoString *fname, MonoAssembly *requesting, gboolean refonly)
+ {
+ 	MonoClass *klass;
+ 	MonoMethod *method;
+ 	MonoBoolean isrefonly;
+-	gpointer params [2];
++	gpointer params [3];
+ 
+ 	if (mono_runtime_get_no_exec ())
+ 		return NULL;
+@@ -936,15 +930,15 @@ mono_try_assembly_resolve (MonoDomain *domain, MonoString *fname, gboolean refon
+ 
+ 	isrefonly = refonly ? 1 : 0;
+ 	params [0] = fname;
+-	params [1] = &isrefonly;
++	params [1] = (requesting) ? mono_assembly_get_object (domain, requesting) : NULL;
++	params [2] = &isrefonly;
+ 	return (MonoReflectionAssembly *) mono_runtime_invoke (method, domain->domain, params, NULL);
+ }
+ 
+-static MonoAssembly *
+-mono_domain_assembly_postload_search (MonoAssemblyName *aname,
+-									  gpointer user_data)
++MonoAssembly *
++mono_domain_assembly_postload_search (MonoAssemblyName *aname, MonoAssembly *requesting,
++									  gboolean refonly)
+ {
+-	gboolean refonly = GPOINTER_TO_UINT (user_data);
+ 	MonoReflectionAssembly *assembly;
+ 	MonoDomain *domain = mono_domain_get ();
+ 	char *aname_str;
+@@ -958,7 +952,7 @@ mono_domain_assembly_postload_search (MonoAssemblyName *aname,
+ 		g_free (aname_str);
+ 		return NULL;
+ 	}
+-	assembly = mono_try_assembly_resolve (domain, str, refonly);
++	assembly = mono_try_assembly_resolve (domain, str, requesting, refonly);
+ 	g_free (aname_str);
+ 
+ 	if (assembly)
+@@ -1983,7 +1977,7 @@ ves_icall_System_AppDomain_LoadAssembly (MonoAppDomain *ad,  MonoString *assRef,
+ 	if (!parsed) {
+ 		/* This is a parse error... */
+ 		if (!refOnly)
+-			refass = mono_try_assembly_resolve (domain, assRef, refOnly);
++			refass = mono_try_assembly_resolve (domain, assRef, NULL, refOnly);
+ 		return refass;
+ 	}
+ 
+@@ -1993,7 +1987,7 @@ ves_icall_System_AppDomain_LoadAssembly (MonoAppDomain *ad,  MonoString *assRef,
+ 	if (!ass) {
+ 		/* MS.NET doesn't seem to call the assembly resolve handler for refonly assemblies */
+ 		if (!refOnly)
+-			refass = mono_try_assembly_resolve (domain, assRef, refOnly);
++			refass = mono_try_assembly_resolve (domain, assRef, NULL, refOnly);
+ 		else
+ 			refass = NULL;
+ 		if (!refass) {
+diff --git a/mono/metadata/assembly.c b/mono/metadata/assembly.c
+index afda4dd..7174c55 100644
+--- a/mono/metadata/assembly.c
++++ b/mono/metadata/assembly.c
+@@ -183,7 +183,9 @@ static mono_mutex_t assembly_binding_mutex;
+ static GSList *loaded_assembly_bindings = NULL;
+ 
+ static MonoAssembly*
+-mono_assembly_invoke_search_hook_internal (MonoAssemblyName *aname, gboolean refonly, gboolean postload);
++mono_assembly_invoke_search_hook_internal (MonoAssemblyName *aname, MonoAssembly *requesting, gboolean refonly, gboolean postload);
++static MonoAssembly*
++mono_assembly_load_full_internal (MonoAssemblyName *aname, MonoAssembly *requesting, const char *basedir, MonoImageOpenStatus *status, gboolean refonly);
+ static MonoBoolean
+ mono_assembly_is_in_gac (const gchar *filanem);
+ 
+@@ -1090,12 +1092,12 @@ mono_assembly_load_reference (MonoImage *image, int index)
+ 	if (image->assembly && image->assembly->ref_only) {
+ 		/* We use the loaded corlib */
+ 		if (!strcmp (aname.name, "mscorlib"))
+-			reference = mono_assembly_load_full (&aname, image->assembly->basedir, &status, FALSE);
++			reference = mono_assembly_load_full_internal (&aname, image->assembly, image->assembly->basedir, &status, FALSE);
+ 		else {
+ 			reference = mono_assembly_loaded_full (&aname, TRUE);
+ 			if (!reference)
+ 				/* Try a postload search hook */
+-				reference = mono_assembly_invoke_search_hook_internal (&aname, TRUE, TRUE);
++				reference = mono_assembly_invoke_search_hook_internal (&aname, image->assembly, TRUE, TRUE);
+ 		}
+ 
+ 		/*
+@@ -1111,9 +1113,9 @@ mono_assembly_load_reference (MonoImage *image, int index)
+ 		 * The second load attempt has the basedir set to keep compatibility with the old mono behavior, for
+ 		 * example bug-349190.2.cs and who knows how much more code in the wild.
+ 		 */
+-		reference = mono_assembly_load (&aname, NULL, &status);
++		reference = mono_assembly_load_full_internal (&aname, image->assembly, NULL, &status, FALSE);
+ 		if (!reference && image->assembly)
+-			reference = mono_assembly_load (&aname, image->assembly->basedir, &status);
++			reference = mono_assembly_load_full_internal (&aname, image->assembly, image->assembly->basedir, &status, FALSE);
+ 	}
+ 
+ 	if (reference == NULL){
+@@ -1232,7 +1234,7 @@ struct AssemblySearchHook {
+ AssemblySearchHook *assembly_search_hook = NULL;
+ 
+ static MonoAssembly*
+-mono_assembly_invoke_search_hook_internal (MonoAssemblyName *aname, gboolean refonly, gboolean postload)
++mono_assembly_invoke_search_hook_internal (MonoAssemblyName *aname, MonoAssembly *requesting, gboolean refonly, gboolean postload)
+ {
+ 	AssemblySearchHook *hook;
+ 
+@@ -1244,13 +1246,16 @@ mono_assembly_invoke_search_hook_internal (MonoAssemblyName *aname, gboolean ref
+ 		}
+ 	}
+ 
++	if (postload)
++		return mono_domain_assembly_postload_search(aname, requesting, refonly);
++
+ 	return NULL;
+ }
+ 
+ MonoAssembly*
+ mono_assembly_invoke_search_hook (MonoAssemblyName *aname)
+ {
+-	return mono_assembly_invoke_search_hook_internal (aname, FALSE, FALSE);
++	return mono_assembly_invoke_search_hook_internal (aname, NULL, FALSE, FALSE);
+ }
+ 
+ static void
+@@ -1764,7 +1769,7 @@ mono_assembly_load_from_full (MonoImage *image, const char*fname,
+ 	 * assemblies lock.
+ 	 */
+ 	if (ass->aname.name) {
+-		ass2 = mono_assembly_invoke_search_hook_internal (&ass->aname, refonly, FALSE);
++		ass2 = mono_assembly_invoke_search_hook_internal (&ass->aname, NULL, refonly, FALSE);
+ 		if (ass2) {
+ 			g_free (ass);
+ 			g_free (base_dir);
+@@ -2367,7 +2372,7 @@ mono_assembly_load_with_partial_name (const char *name, MonoImageOpenStatus *sta
+ 		res->in_gac = TRUE;
+ 	else {
+ 		MonoDomain *domain = mono_domain_get ();
+-		MonoReflectionAssembly *refasm = mono_try_assembly_resolve (domain, mono_string_new (domain, name), FALSE);
++		MonoReflectionAssembly *refasm = mono_try_assembly_resolve (domain, mono_string_new (domain, name), NULL, FALSE);
+ 		if (refasm)
+ 			res = refasm->assembly;
+ 	}
+@@ -2947,6 +2952,17 @@ mono_assembly_load_full_nosearch (MonoAssemblyName *aname,
+ 	return result;
+ }
+ 
++MonoAssembly*
++mono_assembly_load_full_internal (MonoAssemblyName *aname, MonoAssembly *requesting, const char *basedir, MonoImageOpenStatus *status, gboolean refonly)
++{
++	MonoAssembly *result = mono_assembly_load_full_nosearch (aname, basedir, status, refonly);
++
++	if (!result)
++		/* Try a postload search hook */
++		result = mono_assembly_invoke_search_hook_internal (aname, requesting, refonly, TRUE);
++	return result;
++}
++
+ /**
+  * mono_assembly_load_full:
+  * @aname: A MonoAssemblyName with the assembly name to load.
+@@ -2966,12 +2982,7 @@ mono_assembly_load_full_nosearch (MonoAssemblyName *aname,
+ MonoAssembly*
+ mono_assembly_load_full (MonoAssemblyName *aname, const char *basedir, MonoImageOpenStatus *status, gboolean refonly)
+ {
+-	MonoAssembly *result = mono_assembly_load_full_nosearch (aname, basedir, status, refonly);
+-	
+-	if (!result)
+-		/* Try a postload search hook */
+-		result = mono_assembly_invoke_search_hook_internal (aname, refonly, TRUE);
+-	return result;
++	return mono_assembly_load_full_internal (aname, NULL, basedir, status, refonly);
+ }
+ 
+ /**
+@@ -2989,9 +3000,9 @@ mono_assembly_load_full (MonoAssemblyName *aname, const char *basedir, MonoImage
+ MonoAssembly*
+ mono_assembly_load (MonoAssemblyName *aname, const char *basedir, MonoImageOpenStatus *status)
+ {
+-	return mono_assembly_load_full (aname, basedir, status, FALSE);
++	return mono_assembly_load_full_internal (aname, NULL, basedir, status, FALSE);
+ }
+-	
++
+ MonoAssembly*
+ mono_assembly_loaded_full (MonoAssemblyName *aname, gboolean refonly)
+ {
+@@ -3000,7 +3011,7 @@ mono_assembly_loaded_full (MonoAssemblyName *aname, gboolean refonly)
+ 
+ 	aname = mono_assembly_remap_version (aname, &maped_aname);
+ 
+-	res = mono_assembly_invoke_search_hook_internal (aname, refonly, FALSE);
++	res = mono_assembly_invoke_search_hook_internal (aname, NULL, refonly, FALSE);
+ 
+ 	return res;
+ }
+diff --git a/mono/metadata/domain-internals.h b/mono/metadata/domain-internals.h
+index f2dfd8b..8f494f7 100644
+--- a/mono/metadata/domain-internals.h
++++ b/mono/metadata/domain-internals.h
+@@ -661,7 +661,10 @@ MONO_API void
+ mono_domain_add_class_static_data (MonoDomain *domain, MonoClass *klass, gpointer data, guint32 *bitmap);
+ 
+ MonoReflectionAssembly *
+-mono_try_assembly_resolve (MonoDomain *domain, MonoString *fname, gboolean refonly) MONO_INTERNAL;
++mono_try_assembly_resolve (MonoDomain *domain, MonoString *fname, MonoAssembly *requesting, gboolean refonly) MONO_INTERNAL;
++
++MonoAssembly *
++mono_domain_assembly_postload_search (MonoAssemblyName *aname, MonoAssembly *requesting, gboolean refonly);
+ 
+ MonoAssembly* mono_assembly_load_full_nosearch (MonoAssemblyName *aname, 
+ 						const char       *basedir, 
+diff --git a/mono/tests/Makefile.am b/mono/tests/Makefile.am
+index e84ba43..808ddae 100644
+--- a/mono/tests/Makefile.am
++++ b/mono/tests/Makefile.am
+@@ -57,6 +57,7 @@ BASE_TEST_CS_SRC=		\
+ 	arraylist.cs		\
+ 	assemblyresolve_event.cs	\
+ 	assemblyresolve_event3.cs	\
++	assemblyresolve_event4.cs	\
+ 	checked.cs		\
+ 	char-isnumber.cs	\
+ 	create-instance.cs	\
+diff --git a/mono/tests/assemblyresolve_event4.cs b/mono/tests/assemblyresolve_event4.cs
+new file mode 100644
+index 0000000..fa12f01
+--- /dev/null
++++ b/mono/tests/assemblyresolve_event4.cs
+@@ -0,0 +1,34 @@
++using System;
++using System.IO;
++using System.Reflection;
++
++class App
++{
++	public static int Main ()
++	{
++		AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler (MyResolveEventHandler);
++
++		try {
++			var a = Assembly.Load ("test");
++			foreach (Type t in a.GetTypes ()) {
++				Console.WriteLine ("pp: " + t + " " + t.BaseType);
++			}
++		} catch (Exception ex) {
++			Console.WriteLine ("Caught exception: {0}", ex);
++			return 1;
++		}
++
++		return 0;
++	}
++
++	static Assembly MyResolveEventHandler (object sender, ResolveEventArgs args)
++	{
++		var path = Path.Combine (Directory.GetCurrentDirectory (), "assemblyresolve", "deps");
++		if (args.Name == "test" && args.RequestingAssembly == null)
++			return Assembly.LoadFile (Path.Combine (path, "test.dll"));
++		if (args.Name == "TestBase, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" && args.RequestingAssembly.GetName ().Name == "test")
++			return Assembly.LoadFile (Path.Combine (path, "TestBase.dll"));
++
++		throw new InvalidOperationException (String.Format ("Unexpected parameter combination {0} {1}", args.Name, args.RequestingAssembly));
++	}
++}
+-- 
+1.9.3
+
