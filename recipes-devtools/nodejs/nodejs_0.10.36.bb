@@ -8,8 +8,8 @@ DEPENDS = "openssl"
 inherit pythonnative
 
 SRC_URI = "http://nodejs.org/dist/v${PV}/node-v${PV}.tar.gz"
-SRC_URI[md5sum] = "2c00d8cf243753996eecdc4f6e2a2d11"
-SRC_URI[sha256sum] = "0043656bb1724cb09dbdc960a2fd6ee37d3badb2f9c75562b2d11235daa40a03"
+SRC_URI[md5sum] = "4b3527b830f2dacaba01aececd509c6f"
+SRC_URI[sha256sum] = "b9d7d1d0294bce46686b13a05da6fc5b1e7743b597544aa888e8e64a9f178c81"
 
 S = "${WORKDIR}/node-v${PV}"
 
