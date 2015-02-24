@@ -4,7 +4,7 @@ BBCLASSEXTEND=+"native"
 
 FILES_${PN} += " ${datadir}/.mono"
 
-inherit KRuntime-environment
+inherit XRE-environment
 
 do_compile() {
 	export PSEUDO_PREFIX=${S}/usr

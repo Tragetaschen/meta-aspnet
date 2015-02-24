@@ -1,7 +1,7 @@
-SRC_URI="https://www.nuget.org/api/v2/package/KRE-Mono/${PV};downloadfilename=KRE-Mono.${PV}.zip;name=kre;subdir=kre-bin-${PV} \
-         https://raw.githubusercontent.com/aspnet/KRuntime/dev/LICENSE.txt;name=license;downloadfilename=KRE-license"
+SRC_URI="https://www.nuget.org/api/v2/package/KRE-Mono/${PV};downloadfilename=XRE-Mono.${PV}.zip;name=kre;subdir=kre-bin-${PV} \
+         https://raw.githubusercontent.com/aspnet/XRE/dev/LICENSE.txt;name=license;downloadfilename=XRE-license"
 LICENSE="Apache-2.0"			
-LIC_FILES_CHKSUM="file://${WORKDIR}/KRE-license;md5=18d62531c894e91f9f01b5146b73468d"
+LIC_FILES_CHKSUM="file://${WORKDIR}/XRE-license;md5=18d62531c894e91f9f01b5146b73468d"
 RDEPENDS_${PN}+="mono"
 BBCLASSEXTEND=+"native"
 
@@ -12,7 +12,7 @@ S="${WORKDIR}/kre-bin-${PV}"
 
 do_install() {
     install -d ${D}${bindir}
-    for i in k klr kpm; do
+    for i in k kpm; do
         target=${D}${bindir}/${i}
         # Update the scripts to look in libdir
         sed -e "2,9d" -e "10iDIR=${libdir}/${PN}" ${S}/bin/${i} > ${target}
@@ -20,6 +20,11 @@ do_install() {
     done
 
     install -d ${D}${libdir}/${PN}/lib
+
+    target=${D}${libdir}/${PN}/klr
+    sed -e "2,9d" -e "10iDIR=${libdir}/${PN}" ${S}/bin/klr > ${target}
+    chmod 0755 ${target}
+
     for i in ${S}/bin/*.dll; do
         install $i ${D}${libdir}/${PN}
     done

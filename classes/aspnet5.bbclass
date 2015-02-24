@@ -1,14 +1,14 @@
-DEPENDS=+" mono-native vnext-certs-native KRuntime-native"
-RDEPENDS_${PN}+="KRuntime"
+DEPENDS=+" mono-native vnext-certs-native XRE-bin-native"
+RDEPENDS_${PN}+="XRE-bin"
 
 BUILD="${WORKDIR}/build"
 FILES_${PN} += "/opt/${PN}"
 
-inherit KRuntime-environment
+inherit XRE-environment
 
 do_compile () {
     kpm restore
-    kpm pack --no-source --quiet -o ${BUILD}
+    kpm bundle --no-source --quiet -o ${BUILD}
 }
 
 do_install () {

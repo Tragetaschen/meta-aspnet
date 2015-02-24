@@ -4,7 +4,7 @@ RDEPENDS_${PN}+="mono"
 BBCLASSEXTEND=+"native"
 DEPENDS=+" mono-native vnext-certs-native"
 
-inherit KRuntime-environment
+inherit XRE-environment
 export KRE_USER_HOME = "${DL_DIR}/.kre"
 
 do_compile() {
