@@ -18,6 +18,11 @@ do_install() {
         sed -e "2,9d" -e "10iDIR=${libdir}/${PN}" ${S}/bin/${i} > ${target}
         chmod 0755 ${target}
     done
+    echo "#!/bin/bash
+DIR=${libdir}/${PN}
+exec \$DIR/klr \"\$@\"
+" > ${D}${bindir}/klr
+    chmod 0755 ${D}${bindir}/klr
 
     install -d ${D}${libdir}/${PN}/lib
 
