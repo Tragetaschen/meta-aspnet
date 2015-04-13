@@ -4,7 +4,7 @@ BBCLASSEXTEND=+"native"
 
 FILES_${PN} += " ${datadir}/.mono"
 
-inherit XRE-environment
+inherit dnx-environment
 
 do_compile() {
 	export PSEUDO_PREFIX=${S}/usr

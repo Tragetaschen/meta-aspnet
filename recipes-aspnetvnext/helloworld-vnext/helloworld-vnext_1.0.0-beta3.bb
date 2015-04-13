@@ -1,5 +1,5 @@
 include helloworld-vnext.inc
 
-SRC_URI[md5sum] = "309d53b1524a71563ecf0e947ad8b729"
-SRC_URI[sha256sum] = "9d5214aa9bb362081fa0a09d1e52d88231fd09bf79a3e0157efb3dc975b75fb9"
+SRC_URI[md5sum] = "3c5913aa876a3ad51b0f86fe8072cfcf"
+SRC_URI[sha256sum] = "bd4fe776be109733abb5f8a87b8b4b72e765f5fcd2c1a54dea06555bb9b1bded"
 

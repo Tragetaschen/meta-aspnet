@@ -1,14 +1,14 @@
-SRC_URI="https://www.nuget.org/api/v2/package/KRE-Mono/${PV};downloadfilename=XRE-Mono.${PV}.zip;name=kre;subdir=kre-bin-${PV} \
-         https://raw.githubusercontent.com/aspnet/XRE/dev/LICENSE.txt;name=license;downloadfilename=XRE-license"
+SRC_URI="https://www.nuget.org/api/v2/package/KRE-Mono/${PV};downloadfilename=dnx-Mono.${PV}.zip;name=dnx;subdir=dnx-bin-${PV} \
+         https://raw.githubusercontent.com/aspnet/dnx/dev/LICENSE.txt;name=license;downloadfilename=dnx-license"
 LICENSE="Apache-2.0"			
-LIC_FILES_CHKSUM="file://${WORKDIR}/XRE-license;md5=18d62531c894e91f9f01b5146b73468d"
+LIC_FILES_CHKSUM="file://${WORKDIR}/dnx-license;md5=18d62531c894e91f9f01b5146b73468d"
 RDEPENDS_${PN}+="mono"
 BBCLASSEXTEND=+"native"
 
 SRC_URI[license.md5sum] = "18d62531c894e91f9f01b5146b73468d"
 SRC_URI[license.sha256sum] = "3b8b4437035351a81b3b808172c5c4133eafd86480ee41a67a080ee973dc3897"
 
-S="${WORKDIR}/kre-bin-${PV}"
+S="${WORKDIR}/dnx-bin-${PV}"
 
 do_install() {
     install -d ${D}${bindir}

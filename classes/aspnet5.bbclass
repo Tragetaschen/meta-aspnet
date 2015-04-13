@@ -1,10 +1,10 @@
-DEPENDS=+" mono-native vnext-certs-native XRE-bin-native"
-RDEPENDS_${PN}+="XRE-bin"
+DEPENDS=+" mono-native vnext-certs-native dnx-bin-native"
+RDEPENDS_${PN}+="dnx-bin"
 
 BUILD="${WORKDIR}/build"
 FILES_${PN} += "/opt/${PN}"
 
-inherit XRE-environment
+inherit dnx-environment
 
 do_compile () {
     kpm restore
