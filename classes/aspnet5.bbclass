@@ -7,8 +7,8 @@ FILES_${PN} += "/opt/${PN}"
 inherit dnx-environment
 
 do_compile () {
-    kpm restore
-    kpm bundle --no-source --quiet -o ${BUILD}
+    dnu restore
+    dnu publish --no-source --quiet -o ${BUILD}
 }
 
 do_install () {

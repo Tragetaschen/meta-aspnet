@@ -1,4 +1,4 @@
-SRC_URI="https://www.nuget.org/api/v2/package/KRE-Mono/${PV};downloadfilename=dnx-Mono.${PV}.zip;name=dnx;subdir=dnx-bin-${PV} \
+SRC_URI="https://www.nuget.org/api/v2/package/dnx-mono/${PV};downloadfilename=dnx-mono.${PV}.zip;name=dnx;subdir=dnx-bin-${PV} \
          https://raw.githubusercontent.com/aspnet/dnx/dev/LICENSE.txt;name=license;downloadfilename=dnx-license"
 LICENSE="Apache-2.0"			
 LIC_FILES_CHKSUM="file://${WORKDIR}/dnx-license;md5=18d62531c894e91f9f01b5146b73468d"
@@ -12,23 +12,18 @@ S="${WORKDIR}/dnx-bin-${PV}"
 
 do_install() {
     install -d ${D}${bindir}
-    for i in k kpm; do
-        target=${D}${bindir}/${i}
-        # Update the scripts to look in libdir
-        sed -e "2,9d" -e "10iDIR=${libdir}/${PN}" ${S}/bin/${i} > ${target}
-        chmod 0755 ${target}
-    done
+
     echo "#!/bin/bash
-DIR=${libdir}/${PN}
-exec \$DIR/klr \"\$@\"
-" > ${D}${bindir}/klr
-    chmod 0755 ${D}${bindir}/klr
+exec mono \"${libdir}/${PN}/dnx.mono.managed.dll\" \"\$@\"
+" > ${D}${bindir}/dnx
+    chmod 0755 ${D}${bindir}/dnx
+
+    echo "#!/bin/bash
+exec dnx \"${libdir}/${PN}/lib/Microsoft.Framework.PackageManager/Microsoft.Framework.PackageManager.dll\" \"\$@\"
+" > ${D}${bindir}/dnu
+    chmod 0755 ${D}${bindir}/dnu
 
     install -d ${D}${libdir}/${PN}/lib
-
-    target=${D}${libdir}/${PN}/klr
-    sed -e "2,9d" -e "10iDIR=${libdir}/${PN}" ${S}/bin/klr > ${target}
-    chmod 0755 ${target}
 
     for i in ${S}/bin/*.dll; do
         install $i ${D}${libdir}/${PN}
