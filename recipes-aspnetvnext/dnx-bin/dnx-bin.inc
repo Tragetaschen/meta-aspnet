@@ -14,12 +14,12 @@ do_install() {
     install -d ${D}${bindir}
 
     echo "#!/bin/bash
-exec mono \"${libdir}/${PN}/dnx.mono.managed.dll\" \"\$@\"
+exec mono \"${libdir}/${PN}/Microsoft.Dnx.Host.Mono.dll\" \"\$@\"
 " > ${D}${bindir}/dnx
     chmod 0755 ${D}${bindir}/dnx
 
     echo "#!/bin/bash
-exec dnx \"${libdir}/${PN}/lib/Microsoft.Framework.PackageManager/Microsoft.Framework.PackageManager.dll\" \"\$@\"
+exec dnx \"${libdir}/${PN}/lib/Microsoft.Dnx.Tooling/Microsoft.Dnx.Tooling.dll\" \"\$@\"
 " > ${D}${bindir}/dnu
     chmod 0755 ${D}${bindir}/dnu
 
