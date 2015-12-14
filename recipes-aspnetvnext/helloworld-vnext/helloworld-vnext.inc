@@ -4,4 +4,6 @@ LIC_FILES_CHKSUM="file://../../LICENSE.txt;md5=b6dca064e63c2f038081cd782760b67c"
 
 S="${WORKDIR}/dnx-${PV}/samples/HelloWorld"
 
+ADDITIONAL_RESTORE_PACKAGES_append = "../HelloShared"
+
 inherit aspnet5

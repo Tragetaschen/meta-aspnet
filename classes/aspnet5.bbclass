@@ -6,8 +6,13 @@ FILES_${PN} += "/opt/${PN}"
 
 inherit dnx-environment
 
+ADDITIONAL_RESTORE_PACKAGES = ""
+
 do_compile () {
-    dnu restore
+    for i in ${ADDITIONAL_RESTORE_PACKAGES}; do
+        dnu restore $i
+    done
+    dnu restore .
     dnu publish --no-source --quiet -o ${BUILD}
 }
 
