@@ -1,4 +1,4 @@
-DEPENDS=+" mono-native vnext-certs-native dnx-bin-native"
+DEPENDS=+" mono-native dnx-bin-native"
 RDEPENDS_${PN}+="dnx-bin"
 
 BUILD="${WORKDIR}/build"
