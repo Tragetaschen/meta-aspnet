@@ -1,9 +1,9 @@
 SRC_URI="https://github.com/bower/${PN}/archive/v${PV}.tar.gz;downloadfilename=${PN}-${PV}.tar.gz"
 LICENSE="MIT"
 
-LIC_FILES_CHKSUM="file://LICENSE;md5=5bc60e5c591ed5af7f539df58c7d3a7b"
-SRC_URI[md5sum]="a0740ae09334303f07d617d24d9eb103"
-SRC_URI[sha256sum]="6ba9fecf3491ae9f97b37dc1bea4de8790aa67c4f238ef6410d2fb9d957326d5"
+LIC_FILES_CHKSUM="file://LICENSE;md5=135697567327f92e904ef0be2082da5e"
+SRC_URI[md5sum]="a927160bf82914a2a2a42d6283b57c61"
+SRC_URI[sha256sum]="078048f3c96240dfee7ce60d84d61eac5c62502a9f393eb562335bb140452493"
 
 inherit npm-global
 
