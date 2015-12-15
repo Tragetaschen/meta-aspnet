@@ -19,6 +19,8 @@ This layer depends on:
   URI: git://git.yoctoproject.org/meta-mono
   branch: master
 
+  URI: https://github.com/imyller/meta-nodejs
+  branch: master
 
 Patches
 =======
