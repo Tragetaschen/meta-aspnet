@@ -60,4 +60,7 @@ other layers needed. e.g.:
 II. Misc
 ========
 
-hmm…
+The current 4.2 versions of Mono (as of 2015-12-16) don't work with ASP.NET 5.
+I have sucessfully tested `PREFERRED_VERSION_mono[-native]="4.0.4.1"` on an ARM platform,
+when the patches in this layer (especially the IL_0057 one) are applied.
+
