@@ -1,10 +1,10 @@
-DEPENDS=+" mono-native dnx-bin-native"
-RDEPENDS_${PN}+="dnx-bin"
+inherit dnx-environment
+
+DEPENDS +=" mono-native dnx-bin-native"
+RDEPENDS_${PN}+=" dnx-bin"
 
 BUILD="${WORKDIR}/build"
 FILES_${PN} += "/opt/${PN}"
-
-inherit dnx-environment
 
 ADDITIONAL_RESTORE_PACKAGES = ""
 
