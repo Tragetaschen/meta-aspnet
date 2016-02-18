@@ -8,11 +8,14 @@ FILES_${PN} += "/opt/${PN}"
 
 ADDITIONAL_RESTORE_PACKAGES = ""
 
-do_compile () {
+do_configure () {
     for i in ${ADDITIONAL_RESTORE_PACKAGES}; do
         dnu restore $i
     done
     dnu restore .
+}
+
+do_compile () {
     dnu publish --no-source --quiet -o ${BUILD}
 }
 
