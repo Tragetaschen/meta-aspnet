@@ -23,6 +23,9 @@ This layer depends on:
   branch: master
 ```
 
+The build machine also needs .NET Core installed: https://microsoft.com/net/core
+
+
 Patches
 =======
 
@@ -36,18 +39,12 @@ Introduction
 
 Since some time now, Microsoft has opened up many of their .NET related projects.
 This repository tries to bring this into the OpenEmbedded/Yocto environment.
-The main focus at the moment is the ASP.NET 5 (formerly ASP.NET vNext) infrastructure
-which provides a full server-side HTTP web stack and programming environment.
+The main focus at the moment is the ASP.NET Core (formerly ASP.NET 5, formerly ASP.NET vNext)
+infrastructure which provides a full server-side HTTP web stack and programming environment.
 
-There are two main recipes for that:
-`dnx-bin[-native]` installs the official binary release (from NuGet) into the build
-environment and into the final image respectively, so that the `dnx` and `dnu` commands
-become globally available.
-`libuv` builds the event loop library that is the basis of the [Kestrel HTTP server](https://github.com/aspnet/KestrelHttpServer).
-
-These recipes are accompanied by an `aspnet5.bbclass` that helps building ASP.NET 5 projects.
-As samples for its usage, the `helloworld-vnext` and `home-consoleapp-vnext` recipes
-are provided and build a console application.
+There is a `dotnet.bbclass` that helps building ASP.NET Core projects.
+As samples for its usage, the `dotnet-console` and `dotnet-web` recipes
+are provided and build the `dotnet new` console and web application respectively.
 
 In addition, there are some recipes that integrate tooling for web client development
 as it is the provided default in the "Web Application" project template in Visual Studio.
