@@ -45,10 +45,9 @@ infrastructure which provides a full server-side HTTP web stack and programming 
 There is a `dotnet.bbclass` that helps building ASP.NET Core projects.
 As samples for its usage, the `dotnet-console` and `dotnet-web` recipes
 are provided and build the `dotnet new` console and web application respectively.
-
-In addition, there are some recipes that integrate tooling for web client development
-as it is the provided default in the "Web Application" project template in Visual Studio.
-
+These projects are based off of .NET Core and don't yet run in an actual image (see below).
+They serve as a test bed for the build infrastructure. Actual projects have to target the
+"net452" framework or similar to run with Mono.
 
 
 Adding the aspnet layer to your build
@@ -77,18 +76,14 @@ other layers needed. e.g.:
 
 There has always been Mono available as the .NET implementation outside the Windows universe.
 Mono as runtime isn't "officially" supported by Microsoft, but that only means that you cannot
-pay Microsoft to give you support. ASP.NET 5 is actively tested and verified on Mono by the
-ASP.NET team (for example through CI builds) and overall has been a viable platform.
-
-However, there are subtle differences in the implementations that have bitten ASP.NET 5 in the past and
-still do. The current 4.2 versions of Mono (as of 2015-12-16) don't work with ASP.NET 5 and result
-in random hangs. I have sucessfully tested `PREFERRED_VERSION_mono[-native]="4.0.4.1"`
-on an ARM platform, when the patches in this layer (especially the IL_0057 one) are applied.
-But overall, let me emphasize that things keep improving considerably.
+pay Microsoft to give you support. ASP.NET Core is actively tested and verified on Mono by the
+ASP.NET team (for example through CI builds) on a "best effort" basis and overall has been
+a viable platform. Your author has tested the 1.0 RTM version with mono 4.4 on his embedded
+i.MX6 ARM platform.
 
 On the horizon, there is a second option for the .NET Runtime, namely .NET Core which is provided
-by Microsoft directly. Currently, this runtime is ported to Windows/ARM and Linux/x64
-and any porting efforts to Linux/ARM are currently (confirmed on 2016-01-05 in the Standup Meeting)
-at a low priority. In addition, the build environment for that is hard to set up outside of Ubuntu,
-so this repository doesn't yet contain anything in that direction.
+by Microsoft directly. Currently, this runtime is already ported to Windows/ARM and Linux/x64
+and porting efforts to Linux/ARM are currently underway with the introduction of [Samsung in the
+.NET Foundation Technical Steering Group](http://www.dotnetfoundation.org/blog/samsung-join-tsg).
+I expect this repo to include actual .NET Core support in addition to Mono in the future.
 
