@@ -1,7 +1,7 @@
 inherit dotnet-environment
 
 DEPENDS +=" mono-native"
-RDEPENDS_${PN}+=" mono"
+RDEPENDS_${PN}+=" mono libsystemnative"
 
 BUILD="${WORKDIR}/build"
 FILES_${PN} += "/opt/${PN}"

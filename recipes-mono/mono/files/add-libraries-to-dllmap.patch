@@ -1,10 +1,11 @@
 --- a/data/config.in
 +++ b/data/config.in
-@@ -5,6 +5,7 @@
+@@ -5,6 +5,8 @@
 	<dllmap dll="intl" name="bind_textdomain_codeset" target="@LIBC@" os="solaris"/>
 	<dllmap dll="libintl" name="bind_textdomain_codeset" target="@LIBC@" os="solaris"/>
 	<dllmap dll="libintl" target="@INTL@" os="!windows"/>
 +	<dllmap dll="libuv" target="libuv.so.1" os="!windows"/>
++	<dllmap dll="System.Native" target="libsystem-native.so.0" />
 	<dllmap dll="i:libxslt.dll" target="libxslt@libsuffix@" os="!windows"/>
 	<dllmap dll="i:odbc32.dll" target="libodbc@libsuffix@" os="!windows"/>
 	<dllmap dll="i:odbc32.dll" target="libiodbc.dylib" os="osx"/>
