@@ -22,8 +22,14 @@ This layer depends on:
   URI: https://github.com/imyller/meta-nodejs
   branch: master
 ```
+The build machine also needs .NET Core installed: https://dot.net/
 
-The build machine also needs .NET Core installed: https://microsoft.com/net/core
+If you feel adventurous and want to try .NET Core, you'll also need
+```
+  URI: https://github.com/kraj/meta-clang.git
+  branch: morty
+```
+
 
 
 Patches
@@ -81,9 +87,12 @@ ASP.NET team (for example through CI builds) on a "best effort" basis and overal
 a viable platform. Your author has tested the 1.0 RTM version with mono 4.4 on his embedded
 i.MX6 ARM platform.
 
-On the horizon, there is a second option for the .NET Runtime, namely .NET Core which is provided
-by Microsoft directly. Currently, this runtime is already ported to Windows/ARM and Linux/x64
-and porting efforts to Linux/ARM are currently underway with the introduction of [Samsung in the
-.NET Foundation Technical Steering Group](http://www.dotnetfoundation.org/blog/samsung-join-tsg).
-I expect this repo to include actual .NET Core support in addition to Mono in the future.
+In November 2016, Microsoft announced upcoming support for Linux/ARM. There are some 
+preliminary recipes that try to bring up a .NET Core environment in your distribution.
+So far, both CoreCLR and CoreFX are included and an initial experience based on the
+`corerun` executable. This boots a simple CLR host, but doesn't include the NuGet package
+management facilities the `dotnet` host offers.
 
+Running simple, published "Hello World" applications (`dotnet new`) works, ASP.NET Core web
+applications (`dotnet new -t web`) succeed in serving static files, but complicated workloads
+like Razor view compilation need the more sophisticated host.
