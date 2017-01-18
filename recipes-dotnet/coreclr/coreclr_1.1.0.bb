@@ -16,14 +16,20 @@ SRCREV = "release/${PV}"
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=ff80286dabb97a39584a14a3edd91cf2"
 S = "${WORKDIR}/git"
 
+do_fix_target_name() {
+	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
+}
+
+addtask fix_target_name after do_patch before do_configure
+
 do_configure() {
 	cd ${S}
-	ROOTFS_DIR=${STAGING_DIR_HOST} ./build.sh arm release cross skipgenerateversion -skiprestore skipnuget configureonly cmakeargs "-DFEATURE_GDBJIT=TRUE"
+	ROOTFS_DIR=${STAGING_DIR_HOST} GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN} ./build.sh arm release cross skipgenerateversion -skiprestore skipnuget configureonly cmakeargs "-DFEATURE_GDBJIT=TRUE"
 }
 
 do_compile() {
 	cd ${S}
-	ROOTFS_DIR=${STAGING_DIR_HOST} ./build.sh arm release cross skipgenerateversion -skiprestore skipnuget skipconfigure cmakeargs "-DFEATURE_GDBJIT=TRUE"
+	ROOTFS_DIR=${STAGING_DIR_HOST} GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN} ./build.sh arm release cross skipgenerateversion -skiprestore skipnuget skipconfigure cmakeargs "-DFEATURE_GDBJIT=TRUE"
 }
 
 do_install() {
