@@ -14,6 +14,9 @@ SRCREV = "release/${PV}"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3bc66d8592c758a2ec26df8209f71e3"
 S = "${WORKDIR}/git"
 
+# Install the stripped binaries, the unstripped are smaller and causes Bus error
+INSANE_SKIP_${PN} += "already-stripped"
+
 do_configure() {
 	cd ${S}
 	./init-tools.sh
@@ -34,10 +37,10 @@ do_install() {
 
 	install -d ${target}
 
-	for i in `cd ${src}/Linux.arm.Release/Native/ && ls *.so`
+	# Install the stripped binaries, the unstripped are smaller and causes Bus error
+	for i in `ls ${src}/Linux.arm.Release/Native/*.so`
 	do
-		# The non-stripped versions are called *.so.dbg [already-stripped]
-		install -m 0755 ${src}/Linux.arm.Release/Native/${i}.dbg ${target}/${i}
+		install -m 0755 ${i} ${target}
 	done
 	
 	for i in ${DLLS}
