@@ -17,6 +17,12 @@ S = "${WORKDIR}/git"
 # Install the stripped binaries, the unstripped are smaller and causes Bus error
 INSANE_SKIP_${PN} += "already-stripped"
 
+do_fix_target_name() {
+	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
+}
+
+addtask fix_target_name after do_patch before do_configure
+
 do_configure() {
 	cd ${S}
 	./init-tools.sh
@@ -24,7 +30,7 @@ do_configure() {
 
 do_compile() {
 	cd ${S}
-	ROOTFS_DIR=${STAGING_DIR_HOST} ./build-native.sh -release -buildArch=arm -- verbose cross
+	ROOTFS_DIR=${STAGING_DIR_HOST} GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN} ./build-native.sh -release -buildArch=arm -- verbose cross
 	# Bitbake sets bindir ("/usr/bin") which MsBuild would happily pick up
 	# as BinDir to store the built libraries in
 	unset bindir
@@ -42,7 +48,7 @@ do_install() {
 	do
 		install -m 0755 ${i} ${target}
 	done
-	
+
 	for i in ${DLLS}
 	do
 		install -m 0644 ${src}/${i} ${target}
