@@ -4,7 +4,7 @@ LICENSE = "MIT"
 SECTION = "devel"
 
 DEPENDS = "clang-native coreclr libunwind gettext icu openssl util-linux cmake-native krb5 curl"
-RDEPENDS_${PN} = "coreclr libcurl"
+RDEPENDS_${PN} = "coreclr libcurl libuv"
 
 SRC_URI = "git://github.com/dotnet/corefx.git;branch=release/${PV};\
     file://toolchain.patch; \
@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3bc66d8592c758a2ec26df8209f71e3"
 S = "${WORKDIR}/git"
 
 # Install the stripped binaries, the unstripped are smaller and causes Bus error
-INSANE_SKIP_${PN} += "already-stripped"
+INSANE_SKIP_${PN} += "already-stripped dev-so"
 
 do_fix_target_name() {
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
@@ -53,9 +53,24 @@ do_install() {
 	do
 		install -m 0644 ${src}/${i} ${target}
 	done
+
+	# Add link so the runtime can find libuv
+	ln -s /usr/lib/libuv.so.1 ${target}/libuv.so
+
+	# Add DLLs from Microsofts tools distribution
+	for i in ${TOOLS_DLLS}
+	do
+		install -m 0644 ${S}/Tools/${i} ${target}
+	done
 }
 
 FILES_${PN} = "/opt/dotnet"
+TOOLS_DLLS = "\
+  Microsoft.CodeAnalysis.CSharp.dll \
+  Microsoft.CodeAnalysis.dll \
+  Microsoft.CodeAnalysis.VisualBasic.dll \
+  Microsoft.CSharp.dll \
+"
 
 DLLS = "\
   Linux.AnyCPU.Release/System.Data.SqlClient/System.Data.SqlClient.dll \
