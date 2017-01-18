@@ -3,8 +3,8 @@ HOMEPAGE = "http://dot.net/"
 LICENSE = "MIT"
 SECTION = "devel"
 
-DEPENDS = "clang-native coreclr libunwind gettext icu openssl util-linux cmake-native krb5"
-RDEPENDS_${PN} = "coreclr"
+DEPENDS = "clang-native coreclr libunwind gettext icu openssl util-linux cmake-native krb5 curl"
+RDEPENDS_${PN} = "coreclr libcurl"
 
 SRC_URI = "git://github.com/dotnet/corefx.git;branch=release/${PV};\
     file://toolchain.patch; \
