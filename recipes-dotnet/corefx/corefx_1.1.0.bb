@@ -34,7 +34,7 @@ do_install() {
 
 	install -d ${target}
 
-	for i in `${src}/Linux.arm.Release/Native/*.so`
+	for i in `cd ${src}/Linux.arm.Release/Native/ && ls *.so`
 	do
 		# The non-stripped versions are called *.so.dbg [already-stripped]
 		install -m 0755 ${src}/Linux.arm.Release/Native/${i}.dbg ${target}/${i}
