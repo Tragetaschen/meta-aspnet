@@ -1,0 +1,16 @@
+diff --git a/src/arm/Ginit.c b/src/arm/Ginit.c
+index 1ed3dbf..c643032 100644
+--- a/src/arm/Ginit.c
++++ b/src/arm/Ginit.c
+@@ -128,6 +128,11 @@ access_mem (unw_addr_space_t as, unw_word_t addr, unw_word_t *val, int write,
+ {
+   if (write)
+     {
++      /* validate address */
++      const struct cursor *c = (const struct cursor *) arg;
++      if (c && validate_mem(addr))
++        return -1;
++
+       Debug (16, "mem[%x] <- %x\n", addr, *val);
+       *(unw_word_t *) addr = *val;
+     }
