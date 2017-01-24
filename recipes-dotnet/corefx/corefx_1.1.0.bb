@@ -69,7 +69,6 @@ TOOLS_DLLS = "\
   Microsoft.CodeAnalysis.CSharp.dll \
   Microsoft.CodeAnalysis.dll \
   Microsoft.CodeAnalysis.VisualBasic.dll \
-  Microsoft.CSharp.dll \
 "
 
 DLLS = "\
@@ -104,6 +103,7 @@ DLLS = "\
   Unix.AnyCPU.Release/System.Security.Principal.Windows/System.Security.Principal.Windows.dll \
   Unix.AnyCPU.Release/System.Text.Encoding.CodePages/System.Text.Encoding.CodePages.dll \
   Unix.AnyCPU.Release/System.Threading.Overlapped/System.Threading.Overlapped.dll \
+  AnyOS.AnyCPU.Release/Microsoft.CSharp/Microsoft.CSharp.dll \
   AnyOS.AnyCPU.Release/System.AppContext/System.AppContext.dll \
   AnyOS.AnyCPU.Release/System.Buffers/System.Buffers.dll \
   AnyOS.AnyCPU.Release/System.Collections/System.Collections.dll \
