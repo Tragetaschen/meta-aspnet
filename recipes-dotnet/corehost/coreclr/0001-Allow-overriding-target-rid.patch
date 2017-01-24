@@ -1,0 +1,28 @@
+From 53146c03c3ccda7704584d25fb363b599f042370 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ernst=20Sj=C3=B6strand?= <ernst@stickybit.se>
+Date: Fri, 24 Feb 2017 11:46:51 +0100
+Subject: [PATCH] Allow overriding target rid
+
+---
+ build.sh | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/build.sh b/build.sh
+index 8d03121..5992a68 100755
+--- a/build.sh
++++ b/build.sh
+@@ -67,6 +67,11 @@ initHostDistroRid()
+ 
+ initTargetDistroRid()
+ {
++    if [ -n "$YOCTO_FORCE_RID" ]; then
++        export __DistroRid="$YOCTO_FORCE_RID"
++        return 0
++    fi
++
+     if [ $__CrossBuild == 1 ]; then
+         if [ "$__BuildOS" == "Linux" ]; then
+             if [ ! -e $ROOTFS_DIR/etc/os-release ]; then
+-- 
+2.9.3
+
