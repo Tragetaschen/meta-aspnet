@@ -1,0 +1,39 @@
+From 60bc08a0aa950aa2c5093619723270ccdb5f3d70 Mon Sep 17 00:00:00 2001
+From: Kai Ruhnau <kai.ruhnau@target-sg.com>
+Date: Tue, 28 Feb 2017 12:37:11 +0100
+Subject: [PATCH] Avoid declaring the sysroot's usr/include as system include
+
+---
+ src/Native/Unix/System.Net.Http.Native/CMakeLists.txt              | 2 +-
+ src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Native/Unix/System.Net.Http.Native/CMakeLists.txt b/src/Native/Unix/System.Net.Http.Native/CMakeLists.txt
+index 515bdb6..dc9aa7b 100644
+--- a/src/Native/Unix/System.Net.Http.Native/CMakeLists.txt
++++ b/src/Native/Unix/System.Net.Http.Native/CMakeLists.txt
+@@ -23,7 +23,7 @@ set(NATIVEHTTP_SOURCES
+     pal_versioninfo.cpp
+ )
+ 
+-include_directories(SYSTEM ${CURL_INCLUDE_DIR})
++#include_directories(SYSTEM ${CURL_INCLUDE_DIR})
+ 
+ add_library(System.Net.Http.Native
+     SHARED
+diff --git a/src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt b/src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt
+index 28d6454..75c7b01 100644
+--- a/src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt
++++ b/src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt
+@@ -13,7 +13,7 @@ if(CMAKE_STATIC_LIB_LINK)
+ endif(CMAKE_STATIC_LIB_LINK)
+ 
+ find_package(OpenSSL REQUIRED)
+-include_directories(SYSTEM ${OPENSSL_INCLUDE_DIR})
++#include_directories(SYSTEM ${OPENSSL_INCLUDE_DIR})
+ 
+ set(NATIVECRYPTO_SOURCES
+     openssl.cpp
+-- 
+2.5.5
+
