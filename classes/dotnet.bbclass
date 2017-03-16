@@ -6,8 +6,6 @@ RDEPENDS_${PN}+=" mono libsystemnative"
 BUILD="${WORKDIR}/build"
 FILES_${PN} += "/opt/${PN}"
 
-ADDITIONAL_RESTORE_PACKAGES = ""
-
 # Some packages (EF for sqlite, Kestrel) have *.so files bundle.
 # This uses a sledge hammer aproach to fix the build
 PACKAGEBUILDPKGD_remove = "split_and_strip_files"
@@ -23,14 +21,11 @@ do_check () {
 }
 
 do_configure () {
-    for i in ${ADDITIONAL_RESTORE_PACKAGES}; do
-        dotnet restore $i
-    done
-    dotnet restore .
+    dotnet restore -r unix
 }
 
 do_compile () {
-    dotnet publish -c Release -o ${BUILD}
+    dotnet publish -c Release -o ${BUILD} -r unix
 }
 
 do_install () {
