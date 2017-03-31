@@ -16,7 +16,7 @@ SRC_URI = "git://github.com/dotnet/corefx.git;branch=master; \
 PV = "2.0-${COREFX_BUILD_MAJOR}-${COREFX_BUILD_MINOR}"
 
 SRCREV = "${COREFX_SRCREV}"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=e3bc66d8592c758a2ec26df8209f71e3"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 S = "${WORKDIR}/git"
 
 # Install the stripped binaries, the unstripped are smaller and causes Bus error
@@ -75,6 +75,12 @@ do_install() {
 	# Create dev package
 	install -d ${D}/opt/dotnet-nupkg/
 	for i in `ls ${src}/packages/Release/*.nupkg`
+	do
+		install -m 0644 ${i} ${D}/opt/dotnet-nupkg/
+	done
+
+	# Publish nuget packages
+	for i in `ls ${S}/packages/*/*/*.nupkg`
 	do
 		install -m 0644 ${i} ${D}/opt/dotnet-nupkg/
 	done

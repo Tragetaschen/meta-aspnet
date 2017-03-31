@@ -25,9 +25,9 @@ diff --git a/cross/arm/toolchain.cmake b/cross/arm/toolchain.cmake
 index 84ae2a5..2042214 100644
 --- a/cross/arm/toolchain.cmake
 +++ b/cross/arm/toolchain.cmake
-@@ -14,14 +14,16 @@ set(TOOLCHAIN_PREFIX ${TOOLCHAIN}-)
- #set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
- #set(CMAKE_OBJDUMP ${TOOLCHAIN_PREFIX}objdump)
+@@ -6,14 +6,16 @@ set(TOOLCHAIN_PREFIX ${TOOLCHAIN}-)
+ 
+ set(TOOLCHAIN "arm-linux-gnueabihf")
  
 -add_compile_options(-target armv7-linux-gnueabihf)
 +add_compile_options(-target ${TOOLCHAIN})
@@ -38,14 +38,14 @@ index 84ae2a5..2042214 100644
  add_compile_options(--sysroot=${CROSS_ROOTFS})
  
  set(CROSS_LINK_FLAGS "${CROSS_LINK_FLAGS} -target ${TOOLCHAIN}")
--set(CROSS_LINK_FLAGS "${CROSS_LINK_FLAGS} -B ${CROSS_ROOTFS}/usr/lib/gcc/${TOOLCHAIN}")
+-set(CROSS_LINK_FLAGS "${CROSS_LINK_FLAGS} -B${CROSS_ROOTFS}/usr/lib/gcc/${TOOLCHAIN}")
 -set(CROSS_LINK_FLAGS "${CROSS_LINK_FLAGS} -L${CROSS_ROOTFS}/lib/${TOOLCHAIN}")
 +set(CROSS_LINK_FLAGS "${CROSS_LINK_FLAGS} -fuse-ld=$ENV{GCC_TOOLCHAIN}/${TOOLCHAIN}-ld")
 +set(CROSS_LINK_FLAGS "${CROSS_LINK_FLAGS} -mthumb -mfpu=vfpv3 -mfloat-abi=hard -march=armv7l")
  set(CROSS_LINK_FLAGS "${CROSS_LINK_FLAGS} --sysroot=${CROSS_ROOTFS}")
  
  set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS}    ${CROSS_LINK_FLAGS}" CACHE STRING "" FORCE)
-@@ -41,6 +43,6 @@ if(LLVM_ARM_DIR)
+@@ -33,6 +35,6 @@ if(LLVM_ARM_DIR)
      set(LLDB_H "${WITH_LLDB_INCLUDES}" CACHE STRING "")
      set(LLDB "${LLVM_ARM_DIR}/lib/liblldb.so" CACHE STRING "")
  else()

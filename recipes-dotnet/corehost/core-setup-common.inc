@@ -2,15 +2,21 @@ CORE_OS_NAME = "Linux"
 CORE_BUILD_CONFIG = "Release"
 # We need to use a name the buildsystem is familiar with, but it
 # shouldn't really matter since we're building everything from scratch.
-CORE_RUNTIME_ID_BASE = "ubuntu.16.04"
+CORE_RUNTIME_ID_BASE = "linux"
 CORE_RUNTIME_ID = "${CORE_RUNTIME_ID_BASE}-${TARGET_ARCH}"
 
-# This version...
-CORECLR_SRCREV = "7c252140f3db634565baa1bc5075ebc47186a772"
-COREFX_SRCREV = "c015cf7e2567b9f66098ec4cf6176efa16a13298"
-CORE_SETUP_SRCREV = "593fbd48afd7ae8a2d3826ee2d12ec844cbff7c2"
-# ...determines these versions in pkg/projects/Microsoft.NETCore.App/project.json.template
-CORECLR_BUILD_MAJOR = "25013"
-CORECLR_BUILD_MINOR = "01"
-COREFX_BUILD_MAJOR = "25011"
-COREFX_BUILD_MINOR = "01"
+# The following is a consistent set of commits and versions for the three repos
+# First look at https://github.com/dotnet/core-setup/blob/master/pkg/projects/Microsoft.NETCore.App/project.json.template
+# and choose a commit from @dotnet-bot
+CORE_SETUP_SRCREV = "f4cdbf3742198d8114303aaf1a40e86a5d167508"
+# CoreCLR version is from the "transport.Microsoft.NETCore.Runtime.CoreCLR" entry
+CORECLR_BUILD_MAJOR = "25221"
+CORECLR_BUILD_MINOR = "02"
+# CoreFX version is from the "Microsoft.Private.CoreFx.NETCoreApp" entry
+COREFX_BUILD_MAJOR = "25221"
+COREFX_BUILD_MINOR = "02"
+# Then search for a commit by @dotnet-bot for that versions in
+# both https://github.com/dotnet/coreclr/blob/master/dependencies.props
+CORECLR_SRCREV = "0c98335f683ff806b7d282757fb96d8dc8de74e6"
+# and https://github.com/dotnet/corefx/blob/master/dependencies.props
+COREFX_SRCREV = "55b0b4519430f05cb68244a88c061afee0958063"

@@ -4,7 +4,7 @@ LICENSE = "MIT"
 SECTION = "devel"
 
 DEPENDS = "clang-native corefx coreclr cmake-native openssl"
-RDEPENDS_${PN} = "libssl libicuuc libicui18n"
+RDEPENDS_${PN} = "libssl libicuuc libicui18n libcurl"
 
 include core-setup-common.inc
 
@@ -21,17 +21,17 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=42b611e7375c06a28601953626ab16cb"
 S = "${WORKDIR}/git"
 
 # Silence some QA warnings, let's not patch the build any more
-INSANE_SKIP_${PN} += "staticdev ldflags"
+INSANE_SKIP_${PN} += "staticdev ldflags already-stripped"
 
 do_configure() {
     # Double check the configuration. Otherwise corehost may silently download something else.
     grep -q -E '"Microsoft.Private.CoreFx.NETCoreApp":.*${COREFX_BUILD_MAJOR}-${COREFX_BUILD_MINOR}",' ${S}/pkg/projects/Microsoft.NETCore.App/project.json.template || \
         { echo "ERROR: Mismatching CoreFX version in pkg/projects/Microsoft.NETCore.App/project.json.template"; exit 1; }
-    grep -q -E '"Microsoft.NETCore.Runtime.CoreCLR":.*${CORECLR_BUILD_MAJOR}-${CORECLR_BUILD_MINOR}",' ${S}/pkg/projects/Microsoft.NETCore.App/project.json.template || \
+    grep -q -E '"transport.Microsoft.NETCore.Runtime.CoreCLR":.*${CORECLR_BUILD_MAJOR}-${CORECLR_BUILD_MINOR}",' ${S}/pkg/projects/Microsoft.NETCore.App/project.json.template || \
         { echo "ERROR: Mismatching CoreCLR version in pkg/projects/Microsoft.NETCore.App/project.json.template"; exit 1; }
 
     sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
-    sed -i '/dotnet-core/i <add key="local" value="${STAGING_DIR_HOST}/opt/dotnet-nupkg" />' ${S}/NuGet.Config
+    sed -i '/key="dotnet-core"/i <add key="local" value="${STAGING_DIR_HOST}/opt/dotnet-nupkg" />' ${S}/NuGet.Config
 }
 
 do_compile() {
@@ -39,7 +39,10 @@ do_compile() {
     # Bitbake sets bindir ("/usr/bin") which MsBuild would happily pick up
     # as BinDir to store the built libraries in
     unset bindir
-    ./build.sh --skiptests --env-vars DISABLE_CROSSGEN=1,TARGETPLATFORM=${TARGET_ARCH},TARGETRID=${CORE_RUNTIME_ID},CROSS=1,ROOTFS_DIR=${STAGING_DIR_HOST},GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN}
+    ./build.sh -portable --skiptests --env-vars DISABLE_CROSSGEN=1,TARGETPLATFORM=${TARGET_ARCH},TARGETRID=${CORE_RUNTIME_ID},CROSS=1,ROOTFS_DIR=${STAGING_DIR_HOST},CONFIGURATION=${CORE_BUILD_CONFIG},GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN}
+
+    # https://github.com/dotnet/core-setup/issues/1908
+    cp ${S}/artifacts/${CORE_RUNTIME_ID}/corehost/libhostfxr.so ${S}/artifacts/${CORE_RUNTIME_ID}/obj/combined-framework-host/shared/Microsoft.NETCore.App/*/libhostfxr.so
 }
 
 do_install() {

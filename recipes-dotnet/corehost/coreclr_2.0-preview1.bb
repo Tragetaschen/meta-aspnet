@@ -3,8 +3,9 @@ HOMEPAGE = "http://dot.net/"
 LICENSE = "MIT"
 SECTION = "devel"
 
-DEPENDS = "clang-native lldb libunwind gettext icu openssl util-linux cmake-native"
-RDEPENDS_${PN} = "libicuuc libicui18n"
+# lttng-ust: https://github.com/dotnet/coreclr/issues/11174
+DEPENDS = "clang-native lldb libunwind gettext icu openssl util-linux cmake-native lttng-ust"
+RDEPENDS_${PN} = "libicuuc libicui18n lttng-ust"
 
 include core-setup-common.inc
 
@@ -16,7 +17,7 @@ SRC_URI = "git://github.com/dotnet/coreclr.git;branch=master; \
 PV = "2.0-${CORECLR_BUILD_MAJOR}-${CORECLR_BUILD_MINOR}"
 
 SRCREV = "${CORECLR_SRCREV}"
-LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=ff80286dabb97a39584a14a3edd91cf2"
+LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 S = "${WORKDIR}/git"
 
 do_fix_target_name() {
@@ -37,22 +38,25 @@ do_install() {
 
 	install -d ${target}
 
+	#install -m 0755 ${src}/coreconsole ${D}/%{dotnetfwdir}
+	#install -m 0755 ${src}/crossgen ${D}/%{dotnetfwdir}
+	#install -m 0755 ${src}/ilasm ${D}/%{dotnetfwdir}
+	#install -m 0755 ${src}/ildasm ${D}/%{dotnetfwdir}
 	install -m 0755 ${src}/corerun ${target}
 	install -m 0755 ${src}/libclrjit.so ${target}
 	install -m 0755 ${src}/libcoreclr.so ${target}
 	install -m 0755 ${src}/libdbgshim.so ${target}
 	install -m 0755 ${src}/libmscordaccore.so ${target}
 	install -m 0755 ${src}/libmscordbi.so ${target}
-	install -m 0755 ${src}/libsos.so ${target}
+	#install -m 0755 ${src}/libprotojit.so ${target}
 	install -m 0755 ${src}/libsosplugin.so ${target}
-	install -m 0755 ${src}/System.Globalization.Native.so ${target}
-	#install -m 0755 ${src}/coreconsole ${D}/%{dotnetfwdir}
-	#install -m 0755 ${src}/crossgen ${D}/%{dotnetfwdir}
-	#install -m 0755 ${src}/ilasm ${D}/%{dotnetfwdir}
-	#install -m 0755 ${src}/ildasm ${D}/%{dotnetfwdir}
-	install -m 0755 ${src}/mscorlib.dll ${target}
-	install -m 0755 ${src}/System.Private.CoreLib.dll ${target}
+	install -m 0755 ${src}/libsos.so ${target}
+	#install -m 0755 ${src}/libsuper* ${target}
+	#install -m 0755 ${src}/mcs ${target}
 	install -m 0755 ${src}/SOS.NETCore.dll ${target}
+	#install -m 0755 ${src}/superpmi ${target}
+	install -m 0755 ${src}/System.Globalization.Native.so ${target}
+	install -m 0755 ${src}/System.Private.CoreLib.dll ${target}
 
 	# Create dev package
 	install -d ${D}/opt/dotnet-nupkg/
