@@ -1,0 +1,25 @@
+From 60dd1248cb990c3f3912535b862921a7780ae400 Mon Sep 17 00:00:00 2001
+From: Gaurav Khanna <gkhanna@microsoft.com>
+Date: Thu, 27 Apr 2017 16:16:18 -0700
+Subject: [PATCH] Port fix for 1908
+
+---
+ .../shared-build-targets-utils/Utils/PublishMutationUtilties.cs         | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build_projects/shared-build-targets-utils/Utils/PublishMutationUtilties.cs b/build_projects/shared-build-targets-utils/Utils/PublishMutationUtilties.cs
+index 6a788e7..f2e3fb3 100644
+--- a/build_projects/shared-build-targets-utils/Utils/PublishMutationUtilties.cs
++++ b/build_projects/shared-build-targets-utils/Utils/PublishMutationUtilties.cs
+@@ -22,7 +22,7 @@ public class PublishMutationUtilties
+             foreach (var binaryName in binariesToBeDeleted)
+             {
+                 File.Delete(Path.Combine(path, $"{binaryName}{Constants.ExeSuffix}"));
+-                File.Delete(Path.Combine(path, $"{binaryName}.dll"));
++                File.Delete(Path.Combine(path, $"{Constants.DynamicLibPrefix}{binaryName}{Constants.DynamicLibSuffix}"));
+                 File.Delete(Path.Combine(path, $"{binaryName}.pdb"));
+             }
+ 
+-- 
+2.7.4
+

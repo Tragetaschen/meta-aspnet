@@ -9,7 +9,7 @@ RDEPENDS_${PN} = "libicuuc libicui18n lttng-ust"
 
 include core-setup-common.inc
 
-SRC_URI = "git://github.com/dotnet/coreclr.git;branch=master; \
+SRC_URI = "git://github.com/dotnet/coreclr.git;nobranch=1 \
            file://toolchain.patch; \
            file://0001-Allow-overriding-target-rid.patch \
            "

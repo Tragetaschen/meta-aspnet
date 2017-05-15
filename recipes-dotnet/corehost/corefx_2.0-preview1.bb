@@ -8,7 +8,7 @@ RDEPENDS_${PN} = "coreclr libcurl libuv"
 
 include core-setup-common.inc
 
-SRC_URI = "git://github.com/dotnet/corefx.git;branch=master; \
+SRC_URI = "git://github.com/dotnet/corefx.git;nobranch=1 \
     file://toolchain.patch; \
     file://0001-Avoid-declaring-the-sysroot-s-usr-include-as-system-.patch; \
 "

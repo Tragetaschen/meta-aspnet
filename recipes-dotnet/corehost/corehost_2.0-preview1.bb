@@ -8,9 +8,10 @@ RDEPENDS_${PN} = "libssl libicuuc libicui18n libcurl"
 
 include core-setup-common.inc
 
-SRC_URI = "git://github.com/dotnet/core-setup.git;branch=master; \
+SRC_URI = "git://github.com/dotnet/core-setup.git;nobranch=1 \
            file://0001-build.sh-Support-our-build.patch \
            file://0003-cross-toolchain-Use-clang-properly.patch \
+           file://0001-Port-fix-for-1908.patch \
            "
 
 SRCREV = "${CORE_SETUP_SRCREV}"
@@ -40,9 +41,6 @@ do_compile() {
     # as BinDir to store the built libraries in
     unset bindir
     ./build.sh -portable --skiptests --env-vars DISABLE_CROSSGEN=1,TARGETPLATFORM=${TARGET_ARCH},TARGETRID=${CORE_RUNTIME_ID},CROSS=1,ROOTFS_DIR=${STAGING_DIR_HOST},CONFIGURATION=${CORE_BUILD_CONFIG},GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN}
-
-    # https://github.com/dotnet/core-setup/issues/1908
-    cp ${S}/artifacts/${CORE_RUNTIME_ID}/corehost/libhostfxr.so ${S}/artifacts/${CORE_RUNTIME_ID}/obj/combined-framework-host/shared/Microsoft.NETCore.App/*/libhostfxr.so
 }
 
 do_install() {
