@@ -6,17 +6,17 @@ CORE_RUNTIME_ID_BASE = "linux"
 CORE_RUNTIME_ID = "${CORE_RUNTIME_ID_BASE}-${TARGET_ARCH}"
 
 # The following is a consistent set of commits and versions for the three repos
-# First look at https://github.com/dotnet/core-setup/blob/master/pkg/projects/Microsoft.NETCore.App/project.json.template
+# First look at https://github.com/dotnet/core-setup/blob/master/dependencies.props
 # and choose a commit from @dotnet-bot
-CORE_SETUP_SRCREV = "1ff021936263d492539399688f46fd3827169983"
-# CoreCLR version is from the "transport.Microsoft.NETCore.Runtime.CoreCLR" entry
-CORECLR_BUILD_MAJOR = "25302"
-CORECLR_BUILD_MINOR = "01"
-# CoreFX version is from the "Microsoft.Private.CoreFx.NETCoreApp" entry
-COREFX_BUILD_MAJOR = "25305"
-COREFX_BUILD_MINOR = "02"
+CORE_SETUP_SRCREV = "936a2a6229bdd6385e3e8ab0c32ddf0317ac090c"
+# CoreCLR version is from the "<MicrosoftNETCoreRuntimeCoreCLRPackageVersion>" entry
+CORECLR_BUILD_MAJOR = "25316"
+CORECLR_BUILD_MINOR = "03"
+# CoreFX version is from the "<CoreFxVersion>" entry
+COREFX_BUILD_MAJOR = "25316"
+COREFX_BUILD_MINOR = "01"
 # Then search for a commit by @dotnet-bot for that versions in
 # both https://github.com/dotnet/coreclr/blob/master/dependencies.props
-CORECLR_SRCREV = "ea50f78e431f325c4382c21e9b91c3e76898ba1e"
+CORECLR_SRCREV = "36e988ee6593351f1e962118a99154df5eae0254"
 # and https://github.com/dotnet/corefx/blob/master/dependencies.props
-COREFX_SRCREV = "af7d2ae49c79bb279625de4e92f7f91f9fe94f5d"
+COREFX_SRCREV = "27d906c831b119d88f27865624a4a5d7a661c3d5"
