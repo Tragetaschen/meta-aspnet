@@ -11,15 +11,6 @@ FILES_${PN} += "/opt/${PN}"
 PACKAGEBUILDPKGD_remove = "split_and_strip_files"
 INSANE_SKIP_${PN} = "file-rdeps arch"
 
-addtask check before fetch
-
-do_check () {
-	if ! command -v dotnet > /dev/null 2>&1; then
-		bberror "dotnet needs to be installed"
-		return 1
-	fi
-}
-
 do_configure () {
     dotnet restore -r unix
 }
