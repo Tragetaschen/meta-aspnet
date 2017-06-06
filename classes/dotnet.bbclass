@@ -4,7 +4,10 @@ DEPENDS +=" mono-native"
 RDEPENDS_${PN}+=" mono libsystemnative"
 
 BUILD="${WORKDIR}/build"
-FILES_${PN} += "/opt/${PN}"
+PACKAGES = "${PN}-dbg ${PN}"
+
+FILES_${PN} = "/opt/${PN}"
+FILES_${PN}-dbg = "/opt/${PN}/*.pdb"
 
 # Some packages (EF for sqlite, Kestrel) have *.so files bundle.
 # This uses a sledge hammer aproach to fix the build
