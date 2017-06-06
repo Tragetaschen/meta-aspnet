@@ -25,5 +25,8 @@ do_compile () {
 do_install () {
     install -d ${D}/opt/${PN}
     cp -dRf ${BUILD}/* ${D}/opt/${PN}
+    find ${D}/opt/${PN} -type d -exec chmod 755 {} +
+    find ${D}/opt/${PN} -type f -exec chmod 644 {} +
+    chmod 755 ${D}/opt/${PN}/*.exe
 }
 
