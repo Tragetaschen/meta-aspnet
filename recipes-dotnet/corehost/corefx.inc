@@ -14,7 +14,6 @@ SRC_URI = "git://github.com/dotnet/corefx.git;nobranch=1 \
 PV = "2.0-${COREFX_BUILD_MAJOR}-${COREFX_BUILD_MINOR}"
 
 SRCREV = "${COREFX_SRCREV}"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 S = "${WORKDIR}/git"
 
 # Install the stripped binaries, the unstripped are smaller and causes Bus error
