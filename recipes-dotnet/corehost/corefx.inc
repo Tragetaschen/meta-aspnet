@@ -3,7 +3,7 @@ HOMEPAGE = "http://dot.net/"
 LICENSE = "MIT"
 SECTION = "devel"
 
-DEPENDS = "clang-native coreclr libunwind gettext icu openssl util-linux cmake-native krb5 curl"
+DEPENDS = "clang-native coreclr libunwind gettext icu openssl util-linux cmake-native krb5 curl ca-certificates-native"
 RDEPENDS_${PN} = "coreclr libcurl libuv"
 
 SRC_URI = "git://github.com/dotnet/corefx.git;nobranch=1 \
@@ -19,6 +19,8 @@ S = "${WORKDIR}/git"
 
 # Install the stripped binaries, the unstripped are smaller and causes Bus error
 INSANE_SKIP_${PN} += "already-stripped dev-so"
+
+include env.inc
 
 do_fix_target_name() {
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake

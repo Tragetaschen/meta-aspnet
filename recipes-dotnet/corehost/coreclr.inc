@@ -4,7 +4,7 @@ LICENSE = "MIT"
 SECTION = "devel"
 
 # lttng-ust: https://github.com/dotnet/coreclr/issues/11174
-DEPENDS = "clang-native lldb libunwind gettext icu openssl util-linux cmake-native lttng-ust"
+DEPENDS = "clang-native lldb libunwind gettext icu openssl util-linux cmake-native lttng-ust ca-certificates-native"
 RDEPENDS_${PN} = "libicuuc libicui18n lttng-ust"
 
 SRC_URI = "git://github.com/dotnet/coreclr.git;nobranch=1 \
@@ -17,6 +17,8 @@ PV = "2.0-${CORECLR_BUILD_MAJOR}-${CORECLR_BUILD_MINOR}"
 SRCREV = "${CORECLR_SRCREV}"
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 S = "${WORKDIR}/git"
+
+include env.inc
 
 do_fix_target_name() {
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
