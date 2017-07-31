@@ -12,8 +12,6 @@ SRC_URI = "git://github.com/dotnet/coreclr.git;nobranch=1 \
            file://0001-Allow-overriding-target-rid.patch \
            "
 
-PV = "2.0-${CORECLR_BUILD_MAJOR}-${CORECLR_BUILD_MINOR}"
-
 SRCREV = "${CORECLR_SRCREV}"
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 S = "${WORKDIR}/git"

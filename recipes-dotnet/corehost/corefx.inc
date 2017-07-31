@@ -11,8 +11,6 @@ SRC_URI = "git://github.com/dotnet/corefx.git;nobranch=1 \
     file://0001-Avoid-declaring-the-sysroot-s-usr-include-as-system-.patch; \
 "
 
-PV = "2.0-${COREFX_BUILD_MAJOR}-${COREFX_BUILD_MINOR}"
-
 SRCREV = "${COREFX_SRCREV}"
 S = "${WORKDIR}/git"
 

@@ -6,6 +6,7 @@ SRC_URI += "\
   file://0001-Port-fix-for-1908.patch \
 "
 LIC_FILES_CHKSUM = "file://LICENSE;md5=42b611e7375c06a28601953626ab16cb"
+PV = "2.0-${COREFX_BUILD_MAJOR}-${COREFX_BUILD_MINOR}"
 
 do_configure() {
     # Double check the configuration. Otherwise corehost may silently download something else.

@@ -12,8 +12,6 @@ SRC_URI = "git://github.com/dotnet/core-setup.git;nobranch=1 \
 
 SRCREV = "${CORE_SETUP_SRCREV}"
 
-PV = "2.0-${COREFX_BUILD_MAJOR}-${COREFX_BUILD_MINOR}"
-
 S = "${WORKDIR}/git"
 
 # Silence some QA warnings, let's not patch the build any more
