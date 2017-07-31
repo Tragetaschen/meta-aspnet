@@ -2,8 +2,7 @@ CORE_OS_NAME = "Linux"
 CORE_BUILD_CONFIG = "Release"
 # We need to use a name the buildsystem is familiar with, but it
 # shouldn't really matter since we're building everything from scratch.
-CORE_RUNTIME_ID_BASE = "linux"
-CORE_RUNTIME_ID = "${CORE_RUNTIME_ID_BASE}-${TARGET_ARCH}"
+CORE_RUNTIME_ID = "linux-${TARGET_ARCH}"
 
 # The following is a consistent set of commits and versions for the three repos
 # First look at https://github.com/dotnet/core-setup/blob/master/dependencies.props

@@ -2,8 +2,7 @@ CORE_OS_NAME = "Linux"
 CORE_BUILD_CONFIG = "Release"
 # We need to use a name the buildsystem is familiar with, but it
 # shouldn't really matter since we're building everything from scratch.
-CORE_RUNTIME_ID_BASE = "linux"
-CORE_RUNTIME_ID = "${CORE_RUNTIME_ID_BASE}-${TARGET_ARCH}"
+CORE_RUNTIME_ID = "linux-${TARGET_ARCH}"
 
 # The following are the revs of the v2.0.0-preview2 tags in each repository
 CORE_SETUP_SRCREV = "40c565230930ead58a50719c0ec799df77bddee9"
