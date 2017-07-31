@@ -18,7 +18,7 @@ SRCREV = "${CORECLR_SRCREV}"
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 S = "${WORKDIR}/git"
 
-include env.inc
+include base.inc
 
 do_fix_target_name() {
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake

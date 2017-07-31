@@ -19,7 +19,7 @@ S = "${WORKDIR}/git"
 # Silence some QA warnings, let's not patch the build any more
 INSANE_SKIP_${PN} += "staticdev ldflags already-stripped"
 
-include env.inc
+include base.inc
 
 FILES_${PN} = "/opt/dotnet"
 
