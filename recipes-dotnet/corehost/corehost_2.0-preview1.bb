@@ -24,7 +24,7 @@ do_compile() {
     # Bitbake sets bindir ("/usr/bin") which MsBuild would happily pick up
     # as BinDir to store the built libraries in
     unset bindir
-    ./build.sh -portable --skiptests --env-vars DISABLE_CROSSGEN=1,TARGETPLATFORM=${TARGET_ARCH},TARGETRID=${CORE_RUNTIME_ID},CROSS=1,ROOTFS_DIR=${STAGING_DIR_HOST},CONFIGURATION=${CORE_BUILD_CONFIG},GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN}
+    ./build.sh -portable --skiptests --env-vars DISABLE_CROSSGEN=1,TARGETPLATFORM=${TARGET_ARCH},TARGETRID=${CORE_RUNTIME_ID},CROSS=1,ROOTFS_DIR=${STAGING_DIR_HOST},CONFIGURATION=Release,GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN}
 }
 
 do_install() {

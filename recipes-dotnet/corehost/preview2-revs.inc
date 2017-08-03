@@ -1,5 +1,4 @@
 CORE_OS_NAME = "Linux"
-CORE_BUILD_CONFIG = "Release"
 
 # The following are the revs of the v2.0.0-preview2 tags in each repository
 CORE_SETUP_SRCREV = "40c565230930ead58a50719c0ec799df77bddee9"

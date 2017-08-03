@@ -1,5 +1,4 @@
 CORE_OS_NAME = "Linux"
-CORE_BUILD_CONFIG = "Release"
 
 # The following is a consistent set of commits and versions for the three repos
 # First look at https://github.com/dotnet/core-setup/blob/master/dependencies.props

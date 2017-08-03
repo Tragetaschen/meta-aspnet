@@ -24,7 +24,7 @@ do_compile() {
     # as BinDir to store the built libraries in
     unset bindir
     ROOTFS_DIR=${STAGING_DIR_HOST} GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN} ./build.sh \
-        -ConfigurationGroup=${CORE_BUILD_CONFIG} \
+        -ConfigurationGroup=Release \
         -TargetArchitecture=${TARGET_ARCH} \
         -PortableBuild=true \
         -DistroRid=${CORE_RUNTIME_ID} \
@@ -36,6 +36,6 @@ do_compile() {
 do_install() {
     install -d ${D}/opt/dotnet
 
-    cp -dr ${S}/Bin/obj/${CORE_RUNTIME_ID}.${CORE_BUILD_CONFIG}/combined-framework-host/* ${D}/opt/dotnet/
+    cp -dr ${S}/Bin/obj/${CORE_RUNTIME_ID}.Release/combined-framework-host/* ${D}/opt/dotnet/
 }
 
