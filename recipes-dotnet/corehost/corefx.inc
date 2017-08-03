@@ -36,7 +36,7 @@ do_compile() {
 	# Bitbake sets bindir ("/usr/bin") which MsBuild would happily pick up
 	# as BinDir to store the built libraries in
 	unset bindir
-	./run.sh build-managed -SkipTests -release -buildArch=${TARGET_ARCH} -runtimeos=linux -BuildNumberMajor=${COREFX_BUILD_MAJOR} -BuildNumberMinor=${COREFX_BUILD_MINOR}
+	./run.sh build-managed -BuildPackages=true -SkipTests -release -buildArch=${TARGET_ARCH} -runtimeos=linux -BuildNumberMajor=${COREFX_BUILD_MAJOR} -BuildNumberMinor=${COREFX_BUILD_MINOR}
 }
 
 do_install() {
