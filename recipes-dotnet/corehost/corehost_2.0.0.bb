@@ -9,7 +9,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=42b611e7375c06a28601953626ab16cb"
 
 do_configure() {
     sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
-    sed -i '/<packageSources>/a <add key="local" value="${STAGING_DIR_HOST}/opt/dotnet-nupkg" />' ${S}/NuGet.config
 }
 
 do_compile() {
@@ -17,7 +16,7 @@ do_compile() {
     # Bitbake sets bindir ("/usr/bin") which MsBuild would happily pick up
     # as BinDir to store the built libraries in
     unset bindir
-    ROOTFS_DIR=${STAGING_DIR_HOST} GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN} ./build.sh \
+    ROOTFS_DIR=${STAGING_DIR_HOST} GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN} OverridePackageSource="${STAGING_DIR_HOST}/opt/dotnet-nupkg" ./build.sh \
         -ConfigurationGroup=Release \
         -TargetArchitecture=${TARGET_ARCH} \
         -PortableBuild=true \
