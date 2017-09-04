@@ -14,12 +14,14 @@ FILES_${PN}-dbg = "/opt/${PN}/*.pdb"
 PACKAGEBUILDPKGD_remove = "split_and_strip_files"
 INSANE_SKIP_${PN} = "file-rdeps arch"
 
+TARGET_FRAMEWORK ?= "net462"
+
 do_configure () {
     dotnet restore -r unix
 }
 
 do_compile () {
-    dotnet publish -c Release -o ${BUILD} -r unix
+    dotnet publish -c Release -o ${BUILD} -r unix -f ${TARGET_FRAMEWORK}
 }
 
 do_install () {
