@@ -9,6 +9,7 @@ RDEPENDS_${PN} = "coreclr libcurl libuv"
 SRC_URI = "git://github.com/dotnet/corefx.git;nobranch=1 \
     file://toolchain.patch; \
     file://0001-Avoid-declaring-the-sysroot-s-usr-include-as-system-.patch; \
+    file://0009-Changes-to-fix-zero-as-null-pointer-issue.patch \
 "
 
 SRCREV = "${COREFX_SRCREV}"

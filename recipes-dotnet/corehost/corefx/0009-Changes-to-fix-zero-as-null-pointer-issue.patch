@@ -1,0 +1,505 @@
+From 007f95bdddebdb7742323fcd16b1016ae7ea0e00 Mon Sep 17 00:00:00 2001
+From: Ohmkarr <quest.omkareswar@daimler.com>
+Date: Tue, 5 Dec 2017 09:30:08 +0530
+Subject: [PATCH] Nullptr issue when building with Clang 5.0 revised v2
+
+---
+ .../Unix/System.IO.Compression.Native/pal_zlib.cpp |  6 +-
+ src/Native/Unix/System.Native/pal_console.cpp      |  9 ++-
+ src/Native/Unix/System.Native/pal_networking.cpp   |  4 +-
+ src/Native/Unix/System.Native/pal_random.cpp       |  2 +-
+ .../Unix/System.Net.Security.Native/pal_gssapi.cpp | 12 ++--
+ .../openssl.cpp                                    | 75 ++++++++++++++--------
+ .../opensslshim.cpp                                |  2 +-
+ .../pal_ecc_import_export.cpp                      | 10 +--
+ .../pal_ssl.cpp                                    |  7 +-
+ .../pal_x509_name.cpp                              | 20 ++++++
+ 10 files changed, 95 insertions(+), 52 deletions(-)
+
+diff --git a/src/Native/Unix/System.IO.Compression.Native/pal_zlib.cpp b/src/Native/Unix/System.IO.Compression.Native/pal_zlib.cpp
+index 7dd053b..5887a46 100644
+--- a/src/Native/Unix/System.IO.Compression.Native/pal_zlib.cpp
++++ b/src/Native/Unix/System.IO.Compression.Native/pal_zlib.cpp
+@@ -38,9 +38,9 @@ static int32_t Init(PAL_ZStream* stream)
+ 
+     if (zStream != nullptr)
+     {
+-        zStream->zalloc = Z_NULL;
+-        zStream->zfree = Z_NULL;
+-        zStream->opaque = Z_NULL;
++        zStream->zalloc = nullptr;
++        zStream->zfree = nullptr;
++        zStream->opaque = nullptr;
+         return PAL_Z_OK;
+     }
+     else
+diff --git a/src/Native/Unix/System.Native/pal_console.cpp b/src/Native/Unix/System.Native/pal_console.cpp
+index 2d19062..6c40562 100644
+--- a/src/Native/Unix/System.Native/pal_console.cpp
++++ b/src/Native/Unix/System.Native/pal_console.cpp
+@@ -346,7 +346,7 @@ static void HandleSignalForReinitialize(int sig, siginfo_t* siginfo, void* conte
+     // Delegate to any saved handler we may have
+     struct sigaction origHandler = sig == SIGCONT ? g_origSigContHandler : g_origSigChldHandler;
+     if (origHandler.sa_sigaction != nullptr &&
+-        reinterpret_cast<void*>(origHandler.sa_sigaction) != reinterpret_cast<void*>(SIG_DFL) &&
++        reinterpret_cast<void*>(origHandler.sa_sigaction) != reinterpret_cast<void*>(static_cast<__sighandler_t>(nullptr)) &&
+         reinterpret_cast<void*>(origHandler.sa_sigaction) != reinterpret_cast<void*>(SIG_IGN))
+     {
+         origHandler.sa_sigaction(sig, siginfo, context);
+@@ -407,16 +407,16 @@ void* SignalHandlerLoop(void* arg)
+                 if (reinterpret_cast<void*>(g_origSigIntHandler.sa_sigaction) != reinterpret_cast<void*>(SIG_IGN))
+                 {
+                     UninitializeConsole();
+-                    sigaction(SIGINT, &g_origSigIntHandler, NULL);
++                    sigaction(SIGINT, &g_origSigIntHandler, nullptr);
+                     kill(getpid(), SIGINT);
+                 }
+-            } 
++            }
+             else if (signalCode == SIGQUIT)
+             {
+                 if (reinterpret_cast<void*>(g_origSigQuitHandler.sa_sigaction) != reinterpret_cast<void*>(SIG_IGN))
+                 {
+                     UninitializeConsole();
+-                    sigaction(SIGQUIT, &g_origSigQuitHandler, NULL);
++                    sigaction(SIGQUIT, &g_origSigQuitHandler, nullptr);
+                     kill(getpid(), SIGQUIT);
+                 }
+             }
+@@ -473,7 +473,6 @@ static bool InitializeSignalHandling()
+     struct sigaction newAction;
+     memset(&newAction, 0, sizeof(struct sigaction));
+     newAction.sa_flags = SA_RESTART | SA_SIGINFO;
+-    
+     sigemptyset(&newAction.sa_mask);
+     int rv;
+ 
+diff --git a/src/Native/Unix/System.Native/pal_networking.cpp b/src/Native/Unix/System.Native/pal_networking.cpp
+index 177232d..c8d0c3f 100644
+--- a/src/Native/Unix/System.Native/pal_networking.cpp
++++ b/src/Native/Unix/System.Native/pal_networking.cpp
+@@ -1239,7 +1239,9 @@ SystemNative_TryGetIPPacketInformation(MessageHeader* messageHeader, int32_t isI
+     msghdr header;
+     ConvertMessageHeaderToMsghdr(&header, *messageHeader);
+ 
+-    cmsghdr* controlMessage = CMSG_FIRSTHDR(&header);
++    //cmsghdr* controlMessage = CMSG_FIRSTHDR(&header);
++    cmsghdr* controlMessage = (static_cast<size_t>((&header)->msg_controllen) >= sizeof (struct cmsghdr) ? 
++    static_cast<struct cmsghdr *>((&header)->msg_control) : static_cast<struct cmsghdr *>(nullptr));
+     if (isIPv4 != 0)
+     {
+         for (; controlMessage != nullptr && controlMessage->cmsg_len > 0;
+diff --git a/src/Native/Unix/System.Native/pal_random.cpp b/src/Native/Unix/System.Native/pal_random.cpp
+index 74ad5c5..3baa953 100644
+--- a/src/Native/Unix/System.Native/pal_random.cpp
++++ b/src/Native/Unix/System.Native/pal_random.cpp
+@@ -91,7 +91,7 @@ extern "C" void SystemNative_GetNonCryptographicallySecureRandomBytes(uint8_t* b
+ 
+     if (!sInitializedMRand)
+     {
+-        srand48(time(NULL));
++        srand48(time(nullptr));
+         sInitializedMRand = true;
+     }
+ 
+diff --git a/src/Native/Unix/System.Net.Security.Native/pal_gssapi.cpp b/src/Native/Unix/System.Net.Security.Native/pal_gssapi.cpp
+index b03691b..8cc6c67 100644
+--- a/src/Native/Unix/System.Net.Security.Native/pal_gssapi.cpp
++++ b/src/Native/Unix/System.Net.Security.Native/pal_gssapi.cpp
+@@ -100,7 +100,7 @@ extern "C" uint32_t NetSecurityNative_DeleteSecContext(uint32_t* minorStatus, Gs
+     assert(minorStatus != nullptr);
+     assert(contextHandle != nullptr);
+ 
+-    return gss_delete_sec_context(minorStatus, contextHandle, GSS_C_NO_BUFFER);
++    return gss_delete_sec_context(minorStatus, contextHandle, nullptr);
+ }
+ 
+ static uint32_t NetSecurityNative_DisplayStatus(uint32_t* minorStatus,
+@@ -114,7 +114,7 @@ static uint32_t NetSecurityNative_DisplayStatus(uint32_t* minorStatus,
+     uint32_t messageContext;
+     GssBuffer gssBuffer{.length = 0, .value = nullptr};
+     uint32_t majorStatus =
+-        gss_display_status(minorStatus, statusValue, statusType, GSS_C_NO_OID, &messageContext, &gssBuffer);
++        gss_display_status(minorStatus, statusValue, statusType, nullptr, &messageContext, &gssBuffer);
+ 
+     NetSecurityNative_MoveBuffer(&gssBuffer, outBuffer);
+     return majorStatus;
+@@ -234,7 +234,7 @@ extern "C" uint32_t NetSecurityNative_InitSecContext(uint32_t* minorStatus,
+                                                 desiredMech,
+                                                 reqFlags,
+                                                 0,
+-                                                GSS_C_NO_CHANNEL_BINDINGS,
++                                                nullptr,
+                                                 &inputToken,
+                                                 &outmech,
+                                                 &gssBuffer,
+@@ -268,13 +268,13 @@ extern "C" uint32_t NetSecurityNative_AcceptSecContext(uint32_t* minorStatus,
+ 
+     uint32_t majorStatus = gss_accept_sec_context(minorStatus,
+                                                   contextHandle,
+-                                                  GSS_C_NO_CREDENTIAL,
++                                                  nullptr,
+                                                   &inputToken,
+-                                                  GSS_C_NO_CHANNEL_BINDINGS,
++                                                  nullptr,
+                                                   nullptr,
+                                                   nullptr,
+                                                   &gssBuffer,
+-                                                  0,
++                                                  nullptr,
+                                                   nullptr,
+                                                   nullptr);
+ 
+diff --git a/src/Native/Unix/System.Security.Cryptography.Native/openssl.cpp b/src/Native/Unix/System.Security.Cryptography.Native/openssl.cpp
+index ec0205d..51a25a8 100644
+--- a/src/Native/Unix/System.Security.Cryptography.Native/openssl.cpp
++++ b/src/Native/Unix/System.Security.Cryptography.Native/openssl.cpp
+@@ -29,6 +29,29 @@
+ // See X509NameType.UrlName
+ #define NAME_TYPE_URL 5
+ 
++#ifdef  __cplusplus
++extern "C" {
++#endif
++
++#ifdef CHECKED_STACK_OF
++#undef CHECKED_STACK_OF
++# define CHECKED_STACK_OF(type, p) \
++                    reinterpret_cast<_STACK*>((1 ? p : nullptr))
++#endif
++
++typedef void (*fptr)(void *);
++#undef CHECKED_SK_FREE_FUNC
++# define CHECKED_SK_FREE_FUNC(type, p) \
++        reinterpret_cast<fptr> ((1 ? p : nullptr))
++
++#undef CHECKED_PTR_OF
++# define CHECKED_PTR_OF(type, p) \
++                    reinterpret_cast<void*> ((1 ? p : nullptr))
++
++#ifdef  __cplusplus
++}
++#endif
++
+ /*
+ Function:
+ MakeTimeT
+@@ -78,7 +101,7 @@ extern "C" int32_t CryptoNative_GetX509Thumbprint(X509* x509, uint8_t* pBuf, int
+         return -SHA_DIGEST_LENGTH;
+     }
+ 
+-    if (!X509_digest(x509, EVP_sha1(), pBuf, NULL))
++    if (!X509_digest(x509, EVP_sha1(), pBuf, nullptr))
+     {
+         return 0;
+     }
+@@ -104,7 +127,7 @@ extern "C" ASN1_TIME* CryptoNative_GetX509NotBefore(X509* x509)
+         return x509->cert_info->validity->notBefore;
+     }
+ 
+-    return NULL;
++    return nullptr;
+ }
+ 
+ /*
+@@ -125,7 +148,7 @@ extern "C" ASN1_TIME* CryptoNative_GetX509NotAfter(X509* x509)
+         return x509->cert_info->validity->notAfter;
+     }
+ 
+-    return NULL;
++    return nullptr;
+ }
+ 
+ /*
+@@ -146,7 +169,7 @@ extern "C" ASN1_TIME* CryptoNative_GetX509CrlNextUpdate(X509_CRL* crl)
+         return X509_CRL_get_nextUpdate(crl);
+     }
+ 
+-    return NULL;
++    return nullptr;
+ }
+ 
+ /*
+@@ -192,7 +215,7 @@ extern "C" ASN1_OBJECT* CryptoNative_GetX509PublicKeyAlgorithm(X509* x509)
+         return x509->cert_info->key->algor->algorithm;
+     }
+ 
+-    return NULL;
++    return nullptr;
+ }
+ 
+ /*
+@@ -213,7 +236,7 @@ extern "C" ASN1_OBJECT* CryptoNative_GetX509SignatureAlgorithm(X509* x509)
+         return x509->sig_alg->algorithm;
+     }
+ 
+-    return NULL;
++    return nullptr;
+ }
+ 
+ /*
+@@ -241,10 +264,10 @@ extern "C" int32_t CryptoNative_GetX509PublicKeyParameterBytes(X509* x509, uint8
+     {
+         // If pBuf is NULL we're asking for the length, so return 0 (which is negative-zero)
+         // If pBuf is non-NULL we're asking to fill the data, in which case we return 1.
+-        return pBuf != NULL;
++        return pBuf != nullptr;
+     }
+-    
+-    int len = i2d_ASN1_TYPE(parameter, NULL);
++
++    int len = i2d_ASN1_TYPE(parameter, nullptr);
+ 
+     if (cBuf < len)
+     {
+@@ -280,7 +303,7 @@ extern "C" ASN1_BIT_STRING* CryptoNative_GetX509PublicKeyBytes(X509* x509)
+         return x509->cert_info->key->public_key;
+     }
+ 
+-    return NULL;
++    return nullptr;
+ }
+ 
+ /*
+@@ -439,7 +462,7 @@ extern "C" BIO* CryptoNative_GetX509NameInfo(X509* x509, int32_t nameType, int32
+ 
+     if (!x509 || !x509->cert_info || nameType < NAME_TYPE_SIMPLE || nameType > NAME_TYPE_URL)
+     {
+-        return NULL;
++        return nullptr;
+     }
+ 
+     // Algorithm behaviors (pseudocode).  When forIssuer is true, replace "Subject" with "Issuer" and
+@@ -458,11 +481,11 @@ extern "C" BIO* CryptoNative_GetX509NameInfo(X509* x509, int32_t nameType, int32
+ 
+         if (name)
+         {
+-            ASN1_STRING* cn = NULL;
+-            ASN1_STRING* ou = NULL;
+-            ASN1_STRING* o = NULL;
+-            ASN1_STRING* e = NULL;
+-            ASN1_STRING* firstRdn = NULL;
++            ASN1_STRING* cn = nullptr;
++            ASN1_STRING* ou = nullptr;
++            ASN1_STRING* o = nullptr;
++            ASN1_STRING* e = nullptr;
++            ASN1_STRING* firstRdn = nullptr;
+ 
+             // Walk the list backwards because it is stored in stack order
+             for (int i = X509_NAME_entry_count(name) - 1; i >= 0; --i)
+@@ -564,7 +587,7 @@ extern "C" BIO* CryptoNative_GetX509NameInfo(X509* x509, int32_t nameType, int32
+         }
+ 
+         STACK_OF(GENERAL_NAME)* altNames = static_cast<STACK_OF(GENERAL_NAME)*>(
+-            X509_get_ext_d2i(x509, forIssuer ? NID_issuer_alt_name : NID_subject_alt_name, NULL, NULL));
++            X509_get_ext_d2i(x509, forIssuer ? NID_issuer_alt_name : NID_subject_alt_name, nullptr, nullptr));
+ 
+         if (altNames)
+         {
+@@ -576,7 +599,7 @@ extern "C" BIO* CryptoNative_GetX509NameInfo(X509* x509, int32_t nameType, int32
+ 
+                 if (altName && altName->type == expectedType)
+                 {
+-                    ASN1_STRING* str = NULL;
++                    ASN1_STRING* str = nullptr;
+ 
+                     switch (nameType)
+                     {
+@@ -674,7 +697,7 @@ extern "C" BIO* CryptoNative_GetX509NameInfo(X509* x509, int32_t nameType, int32
+         }
+     }
+ 
+-    return NULL;
++    return nullptr;
+ }
+ 
+ /*
+@@ -820,7 +843,7 @@ extern "C" int32_t CryptoNative_CheckX509Hostname(X509* x509, const char* hostna
+     int subjectNid = NID_commonName;
+     int sanGenType = GEN_DNS;
+     GENERAL_NAMES* san = static_cast<GENERAL_NAMES*>(
+-        X509_get_ext_d2i(x509, NID_subject_alt_name, NULL, NULL));
++        X509_get_ext_d2i(x509, NID_subject_alt_name, nullptr, nullptr));
+     char readSubject = 1;
+     int success = 0;
+ 
+@@ -908,7 +931,7 @@ extern "C" int32_t CryptoNative_CheckX509IpAddress(
+ 
+     int subjectNid = NID_commonName;
+     int sanGenType = GEN_IPADD;
+-    GENERAL_NAMES* san = static_cast<GENERAL_NAMES*>(X509_get_ext_d2i(x509, NID_subject_alt_name, NULL, NULL));
++    GENERAL_NAMES* san = static_cast<GENERAL_NAMES*>(X509_get_ext_d2i(x509, NID_subject_alt_name, nullptr, nullptr));
+     int success = 0;
+ 
+     if (san)
+@@ -1069,7 +1092,7 @@ otherwise NULL.
+ */
+ extern "C" X509* CryptoNative_ReadX509AsDerFromBio(BIO* bio)
+ {
+-    return d2i_X509_bio(bio, NULL);
++    return d2i_X509_bio(bio, nullptr);
+ }
+ 
+ /*
+@@ -1094,7 +1117,7 @@ extern "C" int32_t CryptoNative_BioTell(BIO* bio)
+         return -1;
+     }
+ 
+-    return BIO_tell(bio);
++    return static_cast<int>(BIO_ctrl(bio,BIO_C_FILE_TELL,0,nullptr));
+ }
+ 
+ /*
+@@ -1121,7 +1144,7 @@ extern "C" int32_t CryptoNative_BioSeek(BIO* bio, int32_t ofs)
+         return -1;
+     }
+ 
+-    return BIO_seek(bio, ofs);
++    return static_cast<int>(BIO_ctrl(bio,BIO_C_FILE_SEEK,ofs,nullptr));
+ }
+ 
+ /*
+@@ -1342,7 +1365,7 @@ extern "C" int32_t CryptoNative_EnsureOpenSslInitialized()
+     // Initialize each of the locks
+     for (locksInitialized = 0; locksInitialized < numLocks; locksInitialized++)
+     {
+-        if (pthread_mutex_init(&g_locks[locksInitialized], NULL) != 0)
++        if (pthread_mutex_init(&g_locks[locksInitialized], nullptr) != 0)
+         {
+             ret = 3;
+             goto done;
+@@ -1383,7 +1406,7 @@ done:
+                 pthread_mutex_destroy(&g_locks[i]); // ignore failures
+             }
+             delete[] g_locks;
+-            g_locks = NULL;
++            g_locks = nullptr;
+         }
+     }
+ 
+diff --git a/src/Native/Unix/System.Security.Cryptography.Native/opensslshim.cpp b/src/Native/Unix/System.Security.Cryptography.Native/opensslshim.cpp
+index 6be0546..9dcfbc3 100644
+--- a/src/Native/Unix/System.Security.Cryptography.Native/opensslshim.cpp
++++ b/src/Native/Unix/System.Security.Cryptography.Native/opensslshim.cpp
+@@ -46,7 +46,7 @@ void InitializeOpenSSLShim()
+     // Get pointers to all the ICU functions that are needed
+ #define PER_FUNCTION_BLOCK(fn, isRequired) \
+     fn##_ptr = reinterpret_cast<decltype(fn)>(dlsym(libssl, #fn)); \
+-    if ((fn##_ptr) == NULL && isRequired) { fprintf(stderr, "Cannot get required symbol " #fn " from libssl\n"); abort(); }
++    if ((fn##_ptr) == nullptr && isRequired) { fprintf(stderr, "Cannot get required symbol " #fn " from libssl\n"); abort(); }
+ 
+     FOR_ALL_OPENSSL_FUNCTIONS
+ #undef PER_FUNCTION_BLOCK    
+diff --git a/src/Native/Unix/System.Security.Cryptography.Native/pal_ecc_import_export.cpp b/src/Native/Unix/System.Security.Cryptography.Native/pal_ecc_import_export.cpp
+index 6cc7021..7e9ab7d 100644
+--- a/src/Native/Unix/System.Security.Cryptography.Native/pal_ecc_import_export.cpp
++++ b/src/Native/Unix/System.Security.Cryptography.Native/pal_ecc_import_export.cpp
+@@ -125,7 +125,7 @@ extern "C" int32_t CryptoNative_GetECKeyParameters(
+ 
+ error:
+     *cbQx = *cbQy = 0;
+-    *qx = *qy = 0;
++    *qx = *qy = nullptr;
+     if (d) *d = nullptr;
+     if (cbD) *cbD = 0;
+     if (xBn) BN_free(xBn);
+@@ -237,13 +237,13 @@ extern "C" int32_t CryptoNative_GetECCurveParameters(
+ #if HAVE_OPENSSL_EC2M
+     if (API_EXISTS(EC_POINT_get_affine_coordinates_GF2m) && (*curveType == ECCurveType::Characteristic2))
+     {
+-        if (!EC_POINT_get_affine_coordinates_GF2m(group, G, xBn, yBn, NULL)) 
++        if (!EC_POINT_get_affine_coordinates_GF2m(group, G, xBn, yBn, nullptr)) 
+             goto error;
+     }
+     else
+ #endif
+     {
+-        if (!EC_POINT_get_affine_coordinates_GFp(group, G, xBn, yBn, NULL)) 
++        if (!EC_POINT_get_affine_coordinates_GFp(group, G, xBn, yBn, nullptr)) 
+             goto error;
+     }
+ 
+@@ -259,7 +259,7 @@ extern "C" int32_t CryptoNative_GetECCurveParameters(
+     if (EC_GROUP_get0_seed(group))
+     {
+         seedBn = BN_bin2bn(EC_GROUP_get0_seed(group), 
+-            static_cast<int>(EC_GROUP_get_seed_len(group)), NULL);
++            static_cast<int>(EC_GROUP_get_seed_len(group)), nullptr);
+         
+         *seed = seedBn;
+         *cbSeed = BN_num_bytes(seedBn);
+@@ -397,7 +397,7 @@ extern "C" EC_KEY* CryptoNative_EcKeyCreateByExplicitParameters(
+     {
+         // qx, qy, d and seed are optional
+         assert(false);
+-        return 0;
++        return nullptr;
+     }
+ 
+     EC_KEY* key = nullptr;
+diff --git a/src/Native/Unix/System.Security.Cryptography.Native/pal_ssl.cpp b/src/Native/Unix/System.Security.Cryptography.Native/pal_ssl.cpp
+index fda1f4d..2246967 100644
+--- a/src/Native/Unix/System.Security.Cryptography.Native/pal_ssl.cpp
++++ b/src/Native/Unix/System.Security.Cryptography.Native/pal_ssl.cpp
+@@ -35,7 +35,7 @@ extern "C" SSL_CTX* CryptoNative_SslCtxCreate(SSL_METHOD* method)
+     {
+         // As of OpenSSL 1.1.0, compression is disabled by default. In case an older build
+         // is used, ensure it's disabled.
+-        SSL_CTX_set_options(ctx, SSL_OP_NO_COMPRESSION);
++        SSL_CTX_ctrl((ctx),SSL_CTRL_OPTIONS,SSL_OP_NO_COMPRESSION,nullptr);
+     }
+ 
+     return ctx;
+@@ -80,8 +80,7 @@ extern "C" void CryptoNative_SetProtocolOptions(SSL_CTX* ctx, SslProtocols proto
+         protocolOptions |= SSL_OP_NO_TLSv1_2;
+     }
+ #endif
+-
+-    SSL_CTX_set_options(ctx, protocolOptions);
++    SSL_CTX_ctrl((ctx),SSL_CTRL_OPTIONS,protocolOptions,nullptr);
+ }
+ 
+ extern "C" SSL* CryptoNative_SslCreate(SSL_CTX* ctx)
+@@ -141,7 +140,7 @@ extern "C" int32_t CryptoNative_SslGetPeerFinished(SSL* ssl, void* buf, int32_t
+ 
+ extern "C" int32_t CryptoNative_SslSessionReused(SSL* ssl)
+ {
+-    return SSL_session_reused(ssl) == 1;
++    return SSL_ctrl((ssl),SSL_CTRL_GET_SESSION_REUSED,0,nullptr) == 1;
+ }
+ 
+ static bool StringSpanEquals(const char* lhs, const char* rhs, size_t lhsLength)
+diff --git a/src/Native/Unix/System.Security.Cryptography.Native/pal_x509_name.cpp b/src/Native/Unix/System.Security.Cryptography.Native/pal_x509_name.cpp
+index fea2ad4..ee1e7bd 100644
+--- a/src/Native/Unix/System.Security.Cryptography.Native/pal_x509_name.cpp
++++ b/src/Native/Unix/System.Security.Cryptography.Native/pal_x509_name.cpp
+@@ -4,6 +4,26 @@
+ 
+ #include "pal_x509_name.h"
+ 
++#ifdef  __cplusplus
++extern "C" {
++#endif
++
++# undef CHECKED_STACK_OF
++# define CHECKED_STACK_OF(type, p) \
++                    reinterpret_cast<_STACK*> ((1 ? p : nullptr))
++
++# undef CHECKED_PTR_OF
++# define CHECKED_PTR_OF(type, p) \
++                    reinterpret_cast<void*> ((1 ? p : nullptr))
++typedef void (*fptr)(void *);
++# undef CHECKED_SK_FREE_FUNC
++# define CHECKED_SK_FREE_FUNC(type, p) \
++                    reinterpret_cast<fptr> ((1 ? p : nullptr))
++
++#ifdef  __cplusplus
++}
++#endif
++
+ extern "C" int32_t CryptoNative_GetX509NameStackFieldCount(X509NameStack* sk)
+ {
+     return sk_X509_NAME_num(sk);
+-- 
+2.7.4
+
