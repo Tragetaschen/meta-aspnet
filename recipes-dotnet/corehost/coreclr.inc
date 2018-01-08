@@ -10,6 +10,7 @@ RDEPENDS_${PN} = "libicuuc libicui18n lttng-ust"
 SRC_URI = "git://github.com/dotnet/coreclr.git;nobranch=1 \
            file://toolchain.patch; \
            file://0001-Allow-overriding-target-rid.patch \
+           file://0001-Changes-to-fix-unused-lambda-capture.patch \
            "
 
 SRCREV = "${CORECLR_SRCREV}"

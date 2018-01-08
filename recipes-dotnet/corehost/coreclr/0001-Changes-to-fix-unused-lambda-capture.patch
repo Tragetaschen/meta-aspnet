@@ -1,0 +1,39 @@
+From 6e0e11e4cc1cff6443472c5be7872d52ac5c831b Mon Sep 17 00:00:00 2001
+From: Sambit Patnaik <sambit.s.patnaik@daimler.com>
+Date: Sat, 25 Nov 2017 11:21:49 +0530
+Subject: [PATCH 1/1] Changes to fix unused lambda capture  - removal of
+ explicit constructor from superpmi
+
+---
+ src/ToolBox/superpmi/superpmi-shared/methodcontext.cpp | 2 +-
+ src/pal/inc/pal.h                                      | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/ToolBox/superpmi/superpmi-shared/methodcontext.cpp b/src/ToolBox/superpmi/superpmi-shared/methodcontext.cpp
+index e60ef83..ad64d9d 100644
+--- a/src/ToolBox/superpmi/superpmi-shared/methodcontext.cpp
++++ b/src/ToolBox/superpmi/superpmi-shared/methodcontext.cpp
+@@ -297,7 +297,7 @@ void MethodContext::MethodInitHelperFile(HANDLE hFile)
+ 
+ void MethodContext::MethodInitHelper(unsigned char* buff2, unsigned int totalLen)
+ {
+-    MethodContext::MethodContext();
++    //MethodContext::MethodContext();
+ 
+     unsigned int   buffIndex = 0;
+     unsigned int   localsize = 0;
+diff --git a/src/pal/inc/pal.h b/src/pal/inc/pal.h
+index 0f470d9..05adc04 100644
+--- a/src/pal/inc/pal.h
++++ b/src/pal/inc/pal.h
+@@ -6090,6 +6090,7 @@ public:
+     EXCEPTION_DISPOSITION disposition = EXCEPTION_CONTINUE_EXECUTION;           \
+     auto exceptionFilter = [&disposition, &__param](PAL_SEHException& ex)       \
+     {                                                                           \
++        (void)__param;                                                          \
+         disposition = dispositionExpression;                                    \
+         _ASSERTE(disposition != EXCEPTION_CONTINUE_EXECUTION);                  \
+         return disposition;                                                     \
+-- 
+2.7.4
+
