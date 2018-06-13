@@ -21,6 +21,7 @@ do_configure () {
 }
 
 do_compile () {
+    rm -r ${BUILD}
     dotnet publish -c Release -o ${BUILD} -f ${TARGET_FRAMEWORK}
     rm ${BUILD}/System.Diagnostics.Tracing.dll
 }
