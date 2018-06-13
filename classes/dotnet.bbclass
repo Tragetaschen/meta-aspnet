@@ -17,11 +17,11 @@ INSANE_SKIP_${PN} = "file-rdeps arch"
 TARGET_FRAMEWORK ?= "net47"
 
 do_configure () {
-    dotnet restore -r unix
+    dotnet restore
 }
 
 do_compile () {
-    dotnet publish -c Release -o ${BUILD} -r unix -f ${TARGET_FRAMEWORK}
+    dotnet publish -c Release -o ${BUILD} -f ${TARGET_FRAMEWORK}
     rm ${BUILD}/System.Diagnostics.Tracing.dll
 }
 
