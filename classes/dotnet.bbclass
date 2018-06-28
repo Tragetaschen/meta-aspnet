@@ -14,7 +14,7 @@ FILES_${PN}-dbg = "/opt/${PN}/*.pdb"
 PACKAGEBUILDPKGD_remove = "split_and_strip_files"
 INSANE_SKIP_${PN} = "file-rdeps arch"
 
-TARGET_FRAMEWORK ?= "net47"
+TARGET_FRAMEWORK ?= "net471"
 
 do_configure () {
     dotnet restore

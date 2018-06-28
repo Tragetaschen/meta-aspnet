@@ -53,7 +53,7 @@ As samples for its usage, the `dotnet-console` and `dotnet-web` recipes
 are provided and build the `dotnet new` console and web application respectively.
 These projects are based off of .NET Core and don't yet run in an actual image (see below).
 They serve as a test bed for the build infrastructure. Actual projects have to target the
-"net452" framework or similar to run with Mono.
+"net471" framework or similar to run with Mono >= 5.12.
 
 
 Adding the aspnet layer to your build
