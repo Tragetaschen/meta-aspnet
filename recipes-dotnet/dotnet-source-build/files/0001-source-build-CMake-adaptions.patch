@@ -1,0 +1,25 @@
+From b7077c807590a13562be98cf797a257061f0b333 Mon Sep 17 00:00:00 2001
+From: Kai Ruhnau <kai.ruhnau@target-sg.com>
+Date: Mon, 16 Jul 2018 15:53:25 +0200
+Subject: [PATCH] source-build CMake adaptions
+
+---
+ cross/arm/toolchain.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cross/arm/toolchain.cmake b/cross/arm/toolchain.cmake
+index 7ecb34a..90a496b 100644
+--- a/cross/arm/toolchain.cmake
++++ b/cross/arm/toolchain.cmake
+@@ -6,7 +6,7 @@ set(CMAKE_SYSTEM_PROCESSOR armv7l)
+ 
+ set(TOOLCHAIN "arm-linux-gnueabihf")
+ 
+-add_compile_options(-target armv7-linux-gnueabihf)
++add_compile_options(-target ${TOOLCHAIN})
+ add_compile_options(-mthumb)
+ add_compile_options(-mfpu=vfpv3)
+ add_compile_options(--sysroot=${CROSS_ROOTFS})
+-- 
+2.18.0
+

@@ -1,0 +1,28 @@
+From 884f87fe8f755095a626b215cb0aaa145dae3522 Mon Sep 17 00:00:00 2001
+From: Kai Ruhnau <kai.ruhnau@target-sg.com>
+Date: Mon, 16 Jul 2018 16:27:56 +0200
+Subject: [PATCH] Use the existing environment variable for parallel make
+
+---
+ build.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/coreclr/build.sh b/src/coreclr/build.sh
+index 701c631528..a7720f0dce 100755
+--- a/src/coreclr/build.sh
++++ b/src/coreclr/build.sh
+@@ -320,9 +320,9 @@ build_native()
+     # Check that the makefiles were created.
+     pushd "$intermediatesForBuild"
+ 
+-    echo "Executing $buildTool install -j $__NumProc"
++    echo "Executing $buildTool install ${PARALLEL_MAKEINST}"
+ 
+-    $buildTool install -j $__NumProc
++    $buildTool install ${PARALLEL_MAKEINST}
+     if [ $? != 0 ]; then
+         echo "Failed to build $message."
+         exit 1
+-- 
+2.18.0
+

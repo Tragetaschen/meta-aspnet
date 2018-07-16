@@ -1,0 +1,25 @@
+From 910510bd26933fbe0bd8b0ffcea0da519e1b95ec Mon Sep 17 00:00:00 2001
+From: Kai Ruhnau <kai.ruhnau@target-sg.com>
+Date: Fri, 13 Jul 2018 14:26:51 +0200
+Subject: [PATCH] Disable rootfs generation
+
+---
+ tools-local/init-build.proj | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools-local/init-build.proj b/tools-local/init-build.proj
+index 7f390c4..f829d44 100644
+--- a/tools-local/init-build.proj
++++ b/tools-local/init-build.proj
+@@ -61,7 +61,7 @@
+     <MSBuild Projects="@(RepoProjects)" Targets="ApplyPatches" BuildInParallel="$(BuildInParallel)" />
+   </Target>
+ 
+-  <Target Name="GenerateRootFs" Condition="'$(OS)' != 'Windows_NT'">
++  <Target Name="GenerateRootFs" Condition="'$(OS)' != 'Windows_NT' and '$(SkipGenerateRootFs)' == ''">
+      <Exec Condition="$(Platform.Contains('arm')) AND '$(Platform)' != 'armel'" Command="$(ArmEnvironmentVariables) $(ProjectDir)cross/build-rootfs.sh" />
+      <Exec Condition="'$(Platform)' == 'armel'" Command="$(ArmEnvironmentVariables) $(ProjectDir)cross/armel/tizen-build-rootfs.sh" />
+   </Target>
+-- 
+2.18.0
+
