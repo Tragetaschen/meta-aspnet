@@ -12,6 +12,7 @@ SRC_URI = "\
   file://0003-coreclr-Use-the-existing-environment-variable-for-parallel-m.patch \
   file://0001-corefx-CMake-adaptions.patch \
   file://0002-corefx-ASN1_STRING_print_ex-has-an-unsigned-long-flags-argu.patch \
+  file://0001-core-setup-CMake-adaptions.patch \
 "
 SRCREV="71a73952559b639e2ee94a235c915cbbc7fd083a"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9fc642ff452b28d62ab19b7eea50dfb9"
@@ -40,5 +41,6 @@ do_compile() {
 	export ROOTFS_DIR=${STAGING_DIR_HOST}
 	export GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN}
 	export PARALLEL_MAKEINST="${PARALLEL_MAKEINST}"
+	export VersionUserName=meta-aspnet
 	./build.sh /p:Platform=arm /p:Configuration=Release /p:SkipGenerateRootFs=true
 }
