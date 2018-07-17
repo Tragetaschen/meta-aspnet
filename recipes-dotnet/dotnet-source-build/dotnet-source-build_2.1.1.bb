@@ -10,6 +10,8 @@ SRC_URI = "\
   file://0001-coreclr-CMake-adaptions.patch \
   file://0002-coreclr-Compilation-fix.patch \
   file://0003-coreclr-Use-the-existing-environment-variable-for-parallel-m.patch \
+  file://0001-corefx-CMake-adaptions.patch \
+  file://0002-corefx-ASN1_STRING_print_ex-has-an-unsigned-long-flags-argu.patch \
 "
 SRCREV="71a73952559b639e2ee94a235c915cbbc7fd083a"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9fc642ff452b28d62ab19b7eea50dfb9"
@@ -24,6 +26,8 @@ export CURL_CA_BUNDLE = "${STAGING_ETCDIR_NATIVE}/ssl/certs/ca-certificates.crt"
 do_fix_target_name() {
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/src/coreclr/cross/toolchain.cmake
+	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/src/corefx/cross/arm/toolchain.cmake
+	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/src/core-setup/cross/arm/toolchain.cmake
 }
 
 addtask fix_target_name after do_patch before do_configure

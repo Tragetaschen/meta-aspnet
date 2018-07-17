@@ -1,0 +1,26 @@
+From d83d3afaa6596492c87a72a8a64b3dbba57056be Mon Sep 17 00:00:00 2001
+From: Kai Ruhnau <kai.ruhnau@target-sg.com>
+Date: Tue, 17 Jul 2018 16:01:40 +0200
+Subject: [PATCH 2/2] ASN1_STRING_print_ex has an `unsigned long` flags
+ argument
+
+---
+ .../Unix/System.Security.Cryptography.Native/pal_asn1_print.h   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.h b/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.h
+index 982506e420..201e64159e 100644
+--- a/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.h
++++ b/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.h
+@@ -32,7 +32,7 @@ enum Asn1StringTypeFlags : int32_t
+ /*
+ Flags for the 'flags' parameter of CryptoNative_Asn1StringPrintEx.
+ */
+-enum Asn1StringPrintFlags : uint64_t
++enum Asn1StringPrintFlags : unsigned long
+ {
+     PAL_ASN1_STRFLGS_UTF8_CONVERT = 0x10,
+ };
+-- 
+2.18.0
+
