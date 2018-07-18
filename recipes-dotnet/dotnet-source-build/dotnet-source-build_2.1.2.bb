@@ -24,6 +24,7 @@ RDEPENDS_${PN} = "libicuuc libicui18n lttng-ust libcurl libuv libssl"
 
 INSANE_SKIP_${PN} += "staticdev file-rdeps textrel"
 WARN_QA_remove = "libdir"
+SKIP_FILEDEPS_${PN} = "1"
 
 do_fix_target_name() {
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
