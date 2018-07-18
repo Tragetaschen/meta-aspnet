@@ -14,7 +14,7 @@ SRC_URI = "\
   file://0002-corefx-ASN1_STRING_print_ex-has-an-unsigned-long-flags-argu.patch \
   file://0001-core-setup-CMake-adaptions.patch \
 "
-SRCREV="71a73952559b639e2ee94a235c915cbbc7fd083a"
+SRCREV="7f9bbac8deb896d25d31f1829c5ee9ea91a24466"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 
 S = "${WORKDIR}/git"
