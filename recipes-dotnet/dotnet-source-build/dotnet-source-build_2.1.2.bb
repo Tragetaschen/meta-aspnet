@@ -25,8 +25,6 @@ RDEPENDS_${PN} = "libicuuc libicui18n lttng-ust libcurl libuv libssl"
 INSANE_SKIP_${PN} += "staticdev file-rdeps textrel"
 WARN_QA_remove = "libdir"
 
-export CURL_CA_BUNDLE = "${STAGING_ETCDIR_NATIVE}/ssl/certs/ca-certificates.crt"
-
 do_fix_target_name() {
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/cross/arm/toolchain.cmake
 	sed -i s/arm-linux-gnueabihf/${TARGET_SYS}/g ${S}/src/coreclr/cross/toolchain.cmake
@@ -39,6 +37,7 @@ addtask fix_target_name after do_patch before do_configure
 do_compile() {
 	cd ${S}
 	unset bindir
+	export CURL_CA_BUNDLE="${STAGING_ETCDIR_NATIVE}/ssl/certs/ca-certificates.crt"
 	export SOURCE_BUILD_SKIP_SUBMODULE_CHECK=1
 	export ArmEnvironmentVariables="ROOTFS_DIR=${STAGING_DIR_HOST}"
 	export ROOTFS_DIR=${STAGING_DIR_HOST}
