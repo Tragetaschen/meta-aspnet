@@ -22,6 +22,9 @@ S = "${WORKDIR}/git"
 DEPENDS = "clang-native lldb libunwind gettext icu openssl util-linux cmake-native lttng-ust ca-certificates-native krb5 curl"
 RDEPENDS_${PN} = "libicuuc libicui18n lttng-ust libcurl libuv libssl"
 
+INSANE_SKIP_${PN} += "staticdev file-rdeps textrel"
+WARN_QA_remove = "libdir"
+
 export CURL_CA_BUNDLE = "${STAGING_ETCDIR_NATIVE}/ssl/certs/ca-certificates.crt"
 
 do_fix_target_name() {
@@ -44,3 +47,13 @@ do_compile() {
 	export VersionUserName=meta-aspnet
 	./build.sh /p:Platform=arm /p:Configuration=Release /p:SkipGenerateRootFs=true
 }
+
+do_install() {
+    install -d ${D}${datadir}/dotnet
+    install -d ${D}${bindir}
+
+    cp -dr ${S}/src/core-setup/Bin/obj/*-arm.Release/combined-framework-host/* ${D}${datadir}/dotnet/
+    ln -sf ../share/dotnet/dotnet ${D}${bindir}/dotnet
+}
+
+FILES_${PN} = "${datadir}/dotnet ${bindir}/dotnet"
