@@ -35,6 +35,8 @@ do_fix_target_name() {
 
 addtask fix_target_name after do_patch before do_configure
 
+BUILD_CONFIGURATION = "Release"
+
 do_compile() {
 	cd ${S}
 	unset bindir
@@ -45,14 +47,14 @@ do_compile() {
 	export GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN}
 	export PARALLEL_MAKEINST="${PARALLEL_MAKEINST}"
 	export VersionUserName=meta-aspnet
-	./build.sh /p:Platform=arm /p:Configuration=Release /p:SkipGenerateRootFs=true
+	./build.sh /p:Platform=arm /p:Configuration=${BUILD_CONFIGURATION} /p:SkipGenerateRootFs=true
 }
 
 do_install() {
     install -d ${D}${datadir}/dotnet
     install -d ${D}${bindir}
 
-    cp -dr ${S}/src/core-setup/Bin/obj/*-arm.Release/combined-framework-host/* ${D}${datadir}/dotnet/
+    cp -dr ${S}/src/core-setup/Bin/obj/*-arm.${BUILD_CONFIGURATION}/combined-framework-host/* ${D}${datadir}/dotnet/
     ln -sf ../share/dotnet/dotnet ${D}${bindir}/dotnet
 }
 
