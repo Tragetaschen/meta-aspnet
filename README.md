@@ -10,24 +10,24 @@ Dependencies
 This layer depends on:
 ```
   URI: git://git.openembedded.org/bitbake
-  branch: master
+  branch: pyro
 
   URI: git://git.openembedded.org/openembedded-core
   layers: meta
-  branch: master
+  branch: pyro
 
   URI: git://git.yoctoproject.org/meta-mono
-  branch: master
+  branch: pyro
 
   URI: https://github.com/imyller/meta-nodejs
-  branch: master
+  branch: pyro
 ```
 The build machine also needs .NET Core installed: https://dot.net/
 
 If you feel adventurous and want to try .NET Core, you'll also need
 ```
   URI: https://github.com/kraj/meta-clang.git
-  branch: morty
+  branch: pyro
 ```
 
 
@@ -45,8 +45,8 @@ Introduction
 
 Since some time now, Microsoft has opened up many of their .NET related projects.
 This repository tries to bring this into the OpenEmbedded/Yocto environment.
-The main focus at the moment is the ASP.NET Core (formerly ASP.NET 5, formerly ASP.NET vNext)
-infrastructure which provides a full server-side HTTP web stack and programming environment.
+The main focus at the moment is the ASP.NET Core infrastructure which provides
+a full server-side HTTP web stack and programming environment.
 
 There is a `dotnet.bbclass` that helps building ASP.NET Core projects.
 As samples for its usage, the `dotnet-console` and `dotnet-web` recipes
@@ -82,17 +82,17 @@ other layers needed. e.g.:
 
 There has always been Mono available as the .NET implementation outside the Windows universe.
 Mono as runtime isn't "officially" supported by Microsoft, but that only means that you cannot
-pay Microsoft to give you support. ASP.NET Core is actively tested and verified on Mono by the
-ASP.NET team (for example through CI builds) on a "best effort" basis and overall has been
-a viable platform. Your author has tested the 1.0 RTM version with mono 4.4 on his embedded
-i.MX6 ARM platform.
+pay Microsoft to give you support. Your author has tested the 2.1 RTM version with mono 5.12
+on his embedded i.MX6 ARM platform.
 
-In November 2016, Microsoft announced upcoming support for Linux/ARM. There are some 
-preliminary recipes that try to bring up a .NET Core environment in your distribution.
-So far, both CoreCLR and CoreFX are included and an initial experience based on the
-`corerun` executable. This boots a simple CLR host, but doesn't include the NuGet package
-management facilities the `dotnet` host offers.
+Since version 2.1, there's official support for Linux/ARM in .NET Core. This layer
+contains a dotnet-source-build recipe that's based off of https://github.com/dotnet/source-build
+and compiles a runtime and shared library of .NET Core, but not the SDK.
+The source-build build process isn't yet very compatible with the cross-compilation
+environment in bitbake, so for the time being these recipes are limited to ARM.
+.NET Core has official support for x86 and x64 and it might be possible to adapt the recipe
+for those. Aarch64/ARM64 is very close to being supported by .NET Core, but the 2.1 release
+doesn't yet. If you want to try that and adapt the recipe accordingly, I'd appreciate a PR.
 
-Running simple, published "Hello World" applications (`dotnet new`) works, ASP.NET Core web
-applications (`dotnet new -t web`) succeed in serving static files, but complicated workloads
-like Razor view compilation need the more sophisticated host.
+Linux/ARM on Yocto sumo was found to currently *not* work (https://github.com/dotnet/coreclr/issues/19025).
+
