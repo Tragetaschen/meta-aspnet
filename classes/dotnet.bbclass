@@ -15,14 +15,15 @@ PACKAGEBUILDPKGD_remove = "split_and_strip_files"
 INSANE_SKIP_${PN} = "file-rdeps arch"
 
 TARGET_FRAMEWORK ?= "net471"
+MSBUILD_EXTRA_ARGS ?= ""
 
 do_configure () {
-    dotnet restore
+    dotnet restore ${MSBUILD_EXTRA_ARGS}
 }
 
 do_compile () {
     rm -rf ${BUILD}
-    dotnet publish -c Release -o ${BUILD} -f ${TARGET_FRAMEWORK}
+    dotnet publish -c Release -o ${BUILD} -f ${TARGET_FRAMEWORK} ${MSBUILD_EXTRA_ARGS}
     rm ${BUILD}/System.Diagnostics.Tracing.dll
 }
 
