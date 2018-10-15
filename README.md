@@ -18,9 +18,6 @@ This layer depends on:
 
   URI: git://git.yoctoproject.org/meta-mono
   branch: pyro
-
-  URI: https://github.com/imyller/meta-nodejs
-  branch: pyro
 ```
 The build machine also needs .NET Core installed: https://dot.net/
 
