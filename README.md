@@ -21,7 +21,7 @@ This layer depends on:
 ```
 The build machine also needs .NET Core installed: https://dot.net/
 
-If you feel adventurous and want to try .NET Core, you'll also need
+For .NET Core, you'll also need
 ```
   URI: https://github.com/kraj/meta-clang.git
   branch: pyro
@@ -88,8 +88,6 @@ and compiles a runtime and shared library of .NET Core, but not the SDK.
 The source-build build process isn't yet very compatible with the cross-compilation
 environment in bitbake, so for the time being these recipes are limited to ARM.
 .NET Core has official support for x86 and x64 and it might be possible to adapt the recipe
-for those. Aarch64/ARM64 is very close to being supported by .NET Core, but the 2.1 release
-doesn't yet. If you want to try that and adapt the recipe accordingly, I'd appreciate a PR.
-
-Linux/ARM on Yocto sumo was found to currently *not* work (https://github.com/dotnet/coreclr/issues/19025).
+for those. Aarch64/ARM64 is supported starting with .NET Core 2.2. If you want to use that and
+adapt the recipe accordingly, I'd appreciate a PR.
 

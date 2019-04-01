@@ -4,7 +4,7 @@ LICENSE = "MIT"
 SECTION = "devel"
 
 SRC_URI = "\
-  gitsm://github.com/dotnet/source-build;branch=release/2.1 \
+  gitsm://github.com/dotnet/source-build;branch=release/2.2 \
   file://0001-source-build-CMake-adaptions.patch \
   file://0002-source-build-Disable-rootfs-generation.patch \
   file://0001-coreclr-CMake-adaptions.patch \
@@ -12,9 +12,10 @@ SRC_URI = "\
   file://0003-coreclr-Use-the-existing-environment-variable-for-parallel-m.patch \
   file://0001-corefx-CMake-adaptions.patch \
   file://0002-corefx-ASN1_STRING_print_ex-has-an-unsigned-long-flags-argu.patch \
+  file://0001-release-2.1-Fix-build-errors-in-some-build-configura.patch \
   file://0001-core-setup-CMake-adaptions.patch \
 "
-SRCREV="7f9bbac8deb896d25d31f1829c5ee9ea91a24466"
+SRCREV="75c9106dcadb39015675f163fbca814da486665d"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 
 S = "${WORKDIR}/git"
@@ -47,7 +48,8 @@ do_compile() {
 	export GCC_TOOLCHAIN=${STAGING_BINDIR_TOOLCHAIN}
 	export PARALLEL_MAKEINST="${PARALLEL_MAKEINST}"
 	export VersionUserName=meta-aspnet
-	./build.sh /p:Platform=arm /p:Configuration=${BUILD_CONFIGURATION} /p:SkipGenerateRootFs=true
+	export SkipEnsurePackagesCreated=true
+	./build.sh /p:Platform=arm /p:TargetRid=linux-arm /p:Configuration=${BUILD_CONFIGURATION} /p:SkipGenerateRootFs=true
 }
 
 do_install() {
@@ -56,6 +58,8 @@ do_install() {
 
     cp -dr ${S}/src/core-setup/Bin/obj/*-arm.${BUILD_CONFIGURATION}/combined-framework-host/* ${D}${datadir}/dotnet/
     ln -sf ../share/dotnet/dotnet ${D}${bindir}/dotnet
+    # https://github.com/dotnet/coreclr/issues/19025
+    echo "" > ${D}${datadir}/dotnet/shared/Microsoft.NETCore.App/${PV}/libcoreclrtraceptprovider.so
 }
 
 FILES_${PN} = "${datadir}/dotnet ${bindir}/dotnet"

@@ -1,0 +1,65 @@
+From e713bb5ee5779d895762dc0708051a6355b6f72a Mon Sep 17 00:00:00 2001
+From: Omair Majid <omajid@redhat.com>
+Date: Thu, 7 Mar 2019 16:22:08 -0500
+Subject: [PATCH] [release/2.1] Fix build errors in some build configurations
+
+* Change #if NEED_OPENSSL_1_0 to #ifdef NEED_OPENSSL_1_0
+
+This was a mistake in e4bcbd5885 (#34443) made when backporting it to
+the release branches. All other uses of NEED_OPENSSL_1_0 are guarded by
+an #ifdef, not an #if. This one should be too.
+
+The warning is seen when building corefx using source-build. I couldn't observe
+it directly:
+
+    source-build/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.cpp:34:5:
+    error: 'NEED_OPENSSL_1_0' is not defined, evaluates to 0 [-Werror,-Wundef]
+      #if NEED_OPENSSL_1_0
+      ^
+
+* Disable used-but-marked-unused warnings in System.Security.Cryptography.Native
+
+When building in non-portable mode, some OpenSSL 1.1 function defnitions
+that are marked as unused can be picked up by our build. When those
+functions are called, clang reports a warning and fails the build:
+
+    src/Native/Unix/System.Security.Cryptography.Native/openssl.cpp:432:12:
+    error: 'sk_ASN1_OBJECT_num' was marked unused but was used [-Werror,-Wused-but-marked-unused]
+          return sk_ASN1_OBJECT_num(eku);
+                 ^
+
+This 'unused' attribute was recently added to sk_* methods in OpenSSL
+1.1: https://github.com/openssl/openssl/pull/8246
+---
+ .../Unix/System.Security.Cryptography.Native/CMakeLists.txt     | 1 +
+ .../Unix/System.Security.Cryptography.Native/pal_asn1_print.cpp | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt b/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt
+index 9fef63fda8..e9e7dd83f2 100644
+--- a/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt
++++ b/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/CMakeLists.txt
+@@ -5,6 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
+ 
+ # These are happening inside of OpenSSL-defined macros out of our control
+ add_compile_options(-Wno-cast-align)
++add_compile_options(-Wno-used-but-marked-unused)
+ 
+ add_definitions(-DPIC=1 -DOPENSSL_API_COMPAT=0x10100000L)
+ 
+diff --git a/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.cpp b/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.cpp
+index 328b5e5935..0554d509bc 100644
+--- a/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.cpp
++++ b/src/corefx/src/Native/Unix/System.Security.Cryptography.Native/pal_asn1_print.cpp
+@@ -31,7 +31,7 @@ static_assert(PAL_ASN1_STRFLGS_UTF8_CONVERT == ASN1_STRFLGS_UTF8_CONVERT, "");
+ 
+ extern "C" ASN1_STRING* CryptoNative_DecodeAsn1TypeBytes(const uint8_t* buf, int32_t len, Asn1StringTypeFlags type)
+ {
+-#if NEED_OPENSSL_1_0
++#ifdef NEED_OPENSSL_1_0
+     if (!API_EXISTS(d2i_ASN1_type_bytes) || !buf || !len)
+     {
+         return nullptr;
+-- 
+2.19.1
+

@@ -72,7 +72,7 @@ index 352f456d07..81ea703b04 100644
 +# include_directories(SYSTEM ${OPENSSL_INCLUDE_DIR})
  
  set(NATIVECRYPTO_SOURCES
-     openssl.cpp
+     apibridge.cpp
 diff --git a/src/corefx/src/Native/build-native.sh b/src/corefx/src/Native/build-native.sh
 index 364765134d..eda42bdd42 100755
 --- a/src/corefx/src/Native/build-native.sh
