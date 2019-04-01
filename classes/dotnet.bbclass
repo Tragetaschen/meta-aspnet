@@ -3,6 +3,7 @@ inherit insane
 export NUGET_PACKAGES = "${DL_DIR}/.nuget"
 
 RDEPENDS_${PN}+="libsqlite3 libcurl zlib libgssapi-krb5 libssl10"
+RDEPENDS_${PN}+="${@'' if d.getVar('RID_PARAMETER') else 'dotnet-source-build'}"
 
 BUILD="${WORKDIR}/build"
 PACKAGES = "${PN}-dbg ${PN}"
@@ -45,8 +46,10 @@ do_install () {
     cp -dRf ${BUILD}/* ${D}/opt/${PN}
     find ${D}/opt/${PN} -type d -exec chmod 755 {} +
     find ${D}/opt/${PN} -type f -exec chmod 644 {} +
-    chmod a+x ${D}/opt/${PN}/${EXECUTABLE}
-    # https://github.com/dotnet/coreclr/issues/19025
-    echo "" > ${D}/opt/${PN}/libcoreclrtraceptprovider.so
+    if [ -n "${RID_PARAMETER}" ]; then
+        chmod a+x ${D}/opt/${PN}/${EXECUTABLE}
+        # https://github.com/dotnet/coreclr/issues/19025
+        echo "" > ${D}/opt/${PN}/libcoreclrtraceptprovider.so
+    fi
 }
 

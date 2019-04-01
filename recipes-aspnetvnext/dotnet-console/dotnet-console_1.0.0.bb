@@ -1,15 +1,18 @@
 inherit dotnet
 
 LICENSE="MIT"
-SRC_URI="https://github.com/dotnet/cli/raw/rel/1.0.0/LICENSE;downloadfilename=LICENSE-dotnet"
-LIC_FILES_CHKSUM="file://LICENSE-dotnet;md5=42b611e7375c06a28601953626ab16cb"
-SRC_URI[md5sum] = "42b611e7375c06a28601953626ab16cb"
-SRC_URI[sha256sum] = "9d32889a96a7106bb5da8e8395531fc2889c5c20c00f8442d884ad8f2c04998c"
+SRC_URI="https://raw.githubusercontent.com/dotnet/templating/release/2.2/LICENSE;downloadfilename=LICENSE-dotnetconsoletemplate"
+LIC_FILES_CHKSUM="file://LICENSE-dotnetconsoletemplate;md5=114cde7d533aa83500070c86cb529bb4"
+SRC_URI[md5sum] = "114cde7d533aa83500070c86cb529bb4"
+SRC_URI[sha256sum] = "715c0e735e3f43b9f9397c5403ed352b913527cf16d820c14e2dceefd8331b44"
+
+S="${WORKDIR}/${PN}"
+RID_PARAMETER = ""
 
 do_unpack () {
-	mkdir -p ${WORKDIR}/${PN}-${PV}
-	cp ${DL_DIR}/LICENSE-dotnet ${WORKDIR}/${PN}-${PV}
-	cd ${WORKDIR}/${PN}-${PV}
-	dotnet new -t Console || true
+	mkdir -p ${WORKDIR}/${PN}
+	cp ${DL_DIR}/LICENSE-dotnetconsoletemplate ${WORKDIR}/${PN}
+	cd ${WORKDIR}/${PN}
+	dotnet new console
 }
 
