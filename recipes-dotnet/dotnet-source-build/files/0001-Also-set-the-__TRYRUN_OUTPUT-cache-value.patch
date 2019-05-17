@@ -1,0 +1,47 @@
+From: Kai Ruhnau <kai.ruhnau@target-sg.com>
+Date: Fri, 17 May 2019 17:32:26 +0200
+Subject: [PATCH] Also set the *__TRYRUN_OUTPUT cache value
+
+---
+ src/coreclr/cross/tryrun.cmake    | 1 +
+ src/corefx/cross/arm/tryrun.cmake | 9 +++++++++
+ 2 file changed, 10 insertions(+)
+
+diff --git a/src/coreclr/cross/tryrun.cmake b/src/coreclr/cross/tryrun.cmake
+index 16eb2e11a8..c36e9754af 100644
+--- a/src/coreclr/cross/tryrun.cmake
++++ b/src/coreclr/cross/tryrun.cmake
+@@ -2,6 +2,7 @@ set(TARGET_ARCH_NAME $ENV{TARGET_BUILD_ARCH})
+ 
+ macro(set_cache_value)
+   set(${ARGV0} ${ARGV1} CACHE STRING "Result from TRY_RUN" FORCE)
++  set(${ARGV0}__TRYRUN_OUTPUT ${ARGV1} CACHE STRING "Result from TRY_RUN" FORCE)
+ endmacro()
+ 
+ if(TARGET_ARCH_NAME MATCHES "^(armel|arm|arm64|x86)$")
+diff --git a/src/corefx/cross/arm/tryrun.cmake b/src/corefx/cross/arm/tryrun.cmake
+index aeaf7decc4f..10ae0013fdb 100644
+--- a/src/corefx/cross/arm/tryrun.cmake
++++ b/src/corefx/cross/arm/tryrun.cmake
+@@ -1,9 +1,18 @@
+ SET( HAVE_SHM_OPEN_THAT_WORKS_WELL_ENOUGH_WITH_MMAP_EXITCODE
+      0
+      CACHE STRING "Result from TRY_RUN" FORCE)
++SET( HAVE_SHM_OPEN_THAT_WORKS_WELL_ENOUGH_WITH_MMAP_EXITCODE__TRYRUN_OUTPUT
++     0
++     CACHE STRING "Result from TRY_RUN" FORCE)
+ SET( HAVE_CLOCK_MONOTONIC_EXITCODE
+      0
+      CACHE STRING "Result from TRY_RUN" FORCE)
++SET( HAVE_CLOCK_MONOTONIC_EXITCODE__TRYRUN_OUTPUT
++     0
++     CACHE STRING "Result from TRY_RUN" FORCE)
+ SET( HAVE_CLOCK_REALTIME_EXITCODE
+      0
+      CACHE STRING "Result from TRY_RUN" FORCE)
++SET( HAVE_CLOCK_REALTIME_EXITCODE__TRYRUN_OUTPUT
++     0
++     CACHE STRING "Result from TRY_RUN" FORCE)
+-- 
+2.21.0
+

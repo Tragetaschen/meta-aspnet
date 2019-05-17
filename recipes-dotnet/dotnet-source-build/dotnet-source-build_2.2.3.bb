@@ -14,6 +14,8 @@ SRC_URI = "\
   file://0002-corefx-ASN1_STRING_print_ex-has-an-unsigned-long-flags-argu.patch \
   file://0001-release-2.1-Fix-build-errors-in-some-build-configura.patch \
   file://0001-core-setup-CMake-adaptions.patch \
+  file://0001-Also-set-the-__TRYRUN_OUTPUT-cache-value.patch \
+  file://0001-Switch-to-newer-explicit-atomic-API-37456.patch \
 "
 SRCREV="75c9106dcadb39015675f163fbca814da486665d"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9fc642ff452b28d62ab19b7eea50dfb9"

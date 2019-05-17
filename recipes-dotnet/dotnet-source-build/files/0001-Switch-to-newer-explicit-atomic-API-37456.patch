@@ -1,0 +1,31 @@
+From bd278630dd08914ef521e62658afb69845c5b93a Mon Sep 17 00:00:00 2001
+From: Shay Rojansky <roji@roji.org>
+Date: Mon, 6 May 2019 00:58:49 -0700
+Subject: [PATCH] Switch to newer, explicit atomic API (#37456)
+
+Starting with clang 8, the older __sync atomic functions produce a
+warning for implicit strong memory barriers. This switches to the
+newer __atomic API where memory ordering is explicitly specified.
+
+Fixes #37174
+---
+ src/corefx/src/Native/Unix/System.Native/pal_random.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/corefx/src/Native/Unix/System.Native/pal_random.cpp b/src/corefx/src/Native/Unix/System.Native/pal_random.cpp
+index 8a267a34bd1..e0851990625 100644
+--- a/src/corefx/src/Native/Unix/System.Native/pal_random.cpp
++++ b/src/corefx/src/Native/Unix/System.Native/pal_random.cpp
+@@ -51,7 +51,8 @@ void SystemNative_GetNonCryptographicallySecureRandomBytes(uint8_t* buffer, int3
+ 
+             if (fd != -1)
+             {
+-                if (!__sync_bool_compare_and_swap(&rand_des, -1, fd))
++                int expected = -1;
++                if (!__atomic_compare_exchange_n(&rand_des, &expected, fd, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+                 {
+                     // Another thread has already set the rand_des
+                     close(fd);
+-- 
+2.21.0
+
