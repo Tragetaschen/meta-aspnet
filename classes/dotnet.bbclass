@@ -48,8 +48,6 @@ do_install () {
     find ${D}/opt/${PN} -type f -exec chmod 644 {} +
     if [ -n "${RID_PARAMETER}" ]; then
         chmod a+x ${D}/opt/${PN}/${EXECUTABLE}
-        # https://github.com/dotnet/coreclr/issues/19025
-        echo "" > ${D}/opt/${PN}/libcoreclrtraceptprovider.so
     fi
 }
 
